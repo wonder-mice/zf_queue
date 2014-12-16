@@ -12,7 +12,7 @@ struct zf_slist_entry
 template <typename T, zf_slist_entry<T> T:: *entry>
 struct zf_slist_head
 {
-	T *next;
+	T *first;
 };
 
 template <typename T, zf_slist_entry<T> T:: *entry>
@@ -25,19 +25,19 @@ zf_slist_head<T, entry> zf_slist_initializer(const zf_slist_head<T, entry> *cons
 template <typename T, zf_slist_entry<T> T:: *entry>
 void zf_slist_init(zf_slist_head<T, entry> *const h)
 {
-	h->next = 0;
+	h->first = 0;
 }
 
 template <typename T, zf_slist_entry<T> T:: *entry>
 bool zf_slist_empty(zf_slist_head<T, entry> *const h)
 {
-	return 0 == h->next;
+	return 0 == h->first;
 }
 
 template <typename T, zf_slist_entry<T> T:: *entry>
 T *zf_slist_first(zf_slist_head<T, entry> *const h)
 {
-	return h->next;
+	return h->first;
 }
 
 
@@ -56,8 +56,8 @@ T *zf_slist_next(zf_slist_head<T, entry> *const, const T *const e)
 template <typename T, zf_slist_entry<T> T:: *entry>
 void zf_slist_insert_head(zf_slist_head<T, entry> *const h, T *const e)
 {
-	(e->*entry).next = h->next;
-	h->next = e;
+	(e->*entry).next = h->first;
+	h->first = e;
 }
 
 template <typename T>
