@@ -3,6 +3,86 @@
 
 namespace
 {
+	enum param_style
+	{
+		dummy_head,
+		explicit_entry
+	};
+
+	struct slist_node
+	{
+		unsigned a[6];
+		zf_slist_entry<slist_node> entry;
+		unsigned b[7];
+	};
+
+	typedef zf_slist_head<slist_node, &slist_node::entry> slist_nodes;
+
+	void test_slist_initializer()
+	{
+		slist_nodes ns = zf_slist_initializer(&ns);
+		TEST_VERIFY_TRUE(zf_slist_empty(&ns));
+		TEST_VERIFY_EQUAL(nullptr, zf_slist_first(&ns));
+	}
+
+	void test_slist_initialize()
+	{
+		slist_nodes ns;
+		zf_slist_init(&ns);
+		TEST_VERIFY_TRUE(zf_slist_empty(&ns));
+		TEST_VERIFY_EQUAL(nullptr, zf_slist_first(&ns));
+	}
+
+	void test_slist_insert_head()
+	{
+		slist_nodes ns = zf_slist_initializer(&ns);
+		slist_node n0;
+		zf_slist_insert_head(&ns, &n0);
+		TEST_VERIFY_FALSE(zf_slist_empty(&ns));
+		TEST_VERIFY_EQUAL(&n0, zf_slist_first(&ns));
+		TEST_VERIFY_EQUAL(nullptr, zf_slist_next(&ns, &n0));
+		TEST_VERIFY_EQUAL(nullptr, zf_slist_next(&n0, &slist_node::entry));
+		slist_node n1;
+		zf_slist_insert_head(&ns, &n1);
+		TEST_VERIFY_FALSE(zf_slist_empty(&ns));
+		TEST_VERIFY_EQUAL(&n1, zf_slist_first(&ns));
+		TEST_VERIFY_EQUAL(nullptr, zf_slist_next(&ns, &n0));
+		TEST_VERIFY_EQUAL(nullptr, zf_slist_next(&n0, &slist_node::entry));
+		TEST_VERIFY_EQUAL(&n0, zf_slist_next(&ns, &n1));
+		TEST_VERIFY_EQUAL(&n0, zf_slist_next(&n1, &slist_node::entry));
+	}
+
+	void test_slist_insert_after(const param_style style)
+	{
+		slist_nodes ns = zf_slist_initializer(&ns);
+		slist_node n0;
+		zf_slist_insert_head(&ns, &n0);
+		slist_node n1;
+		if (dummy_head == style)
+			zf_slist_insert_after(&ns, &n0, &n1);
+		else if (explicit_entry == style)
+			zf_slist_insert_after(&n0, &n1, &slist_node::entry);
+		TEST_VERIFY_FALSE(zf_slist_empty(&ns));
+		TEST_VERIFY_EQUAL(&n0, zf_slist_first(&ns));
+		TEST_VERIFY_EQUAL(&n1, zf_slist_next(&ns, &n0));
+		TEST_VERIFY_EQUAL(&n1, zf_slist_next(&n0, &slist_node::entry));
+		TEST_VERIFY_EQUAL(nullptr, zf_slist_next(&ns, &n1));
+		TEST_VERIFY_EQUAL(nullptr, zf_slist_next(&n1, &slist_node::entry));
+		slist_node n2;
+		if (dummy_head == style)
+			zf_slist_insert_after(&ns, &n1, &n2);
+		else if (explicit_entry == style)
+			zf_slist_insert_after(&n1, &n2, &slist_node::entry);
+		TEST_VERIFY_FALSE(zf_slist_empty(&ns));
+		TEST_VERIFY_EQUAL(&n0, zf_slist_first(&ns));
+		TEST_VERIFY_EQUAL(&n1, zf_slist_next(&ns, &n0));
+		TEST_VERIFY_EQUAL(&n1, zf_slist_next(&n0, &slist_node::entry));
+		TEST_VERIFY_EQUAL(&n2, zf_slist_next(&ns, &n1));
+		TEST_VERIFY_EQUAL(&n2, zf_slist_next(&n1, &slist_node::entry));
+		TEST_VERIFY_EQUAL(nullptr, zf_slist_next(&ns, &n2));
+		TEST_VERIFY_EQUAL(nullptr, zf_slist_next(&n2, &slist_node::entry));
+	}
+
 	struct tailq_node
 	{
 		unsigned a[6];
@@ -139,6 +219,13 @@ namespace
 int main(int argc, char *argv[])
 {
 	TEST_RUNNER_CREATE(argc, argv);
+
+	TEST_EXECUTE(test_slist_initializer());
+	TEST_EXECUTE(test_slist_initialize());
+	TEST_EXECUTE(test_slist_insert_head());
+	TEST_EXECUTE(test_slist_insert_after(dummy_head));
+	TEST_EXECUTE(test_slist_insert_after(explicit_entry));
+
 	TEST_EXECUTE(test_tailq_initializer());
 	TEST_EXECUTE(test_tailq_initialize());
 	TEST_EXECUTE(test_tailq_insert_head());
