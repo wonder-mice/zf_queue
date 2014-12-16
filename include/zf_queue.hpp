@@ -13,7 +13,6 @@ struct zf_tailq_head
     zf_tailq_entry<T> root;
 };
 
-
 template <typename T, zf_tailq_entry<T> T:: *entry>
 zf_tailq_head<T, entry> zf_tailq_initializer(zf_tailq_head<T, entry> *const h)
 {
