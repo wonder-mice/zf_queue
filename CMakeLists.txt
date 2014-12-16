@@ -6,15 +6,15 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type")
 endif()
 
-project (zf_queue)
+project(zf_queue)
 
 set(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/lib")
 set(EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
+enable_testing()
 
 include(ctags)
-add_ctags_files(include)
 add_ctags_files(test)
+add_ctags_files(zf_queue)
 
 add_subdirectory(zf_queue)
-enable_testing()
 add_subdirectory(test)
