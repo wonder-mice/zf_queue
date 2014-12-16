@@ -55,11 +55,14 @@ int main()
 	Loop loop;
 	Event event1;
 	event1.what = 1;
+	// Need to specify entry field name
 	TAILQ_INSERT_TAIL(&loop, &event1, entry);
 	Event event2;
 	event2.what = 2;
+	// Need to specify entry field name
 	TAILQ_INSERT_TAIL(&loop, &event2, entry);
 	printf("First: %i\n", TAILQ_FIRST(&loop)->what);
+	// Need to specify head type name (EventQueue)
 	printf("Last: %i\n", TAILQ_LAST(&loop, EventQueue)->what);
 }
 ```
