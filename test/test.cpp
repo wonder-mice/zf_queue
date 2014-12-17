@@ -216,9 +216,13 @@ namespace
 	}
 }
 
+void test_link();
+
 int main(int argc, char *argv[])
 {
 	TEST_RUNNER_CREATE(argc, argv);
+
+	TEST_EXECUTE(test_link());
 
 	TEST_EXECUTE(test_slist_initializer());
 	TEST_EXECUTE(test_slist_initialize());
