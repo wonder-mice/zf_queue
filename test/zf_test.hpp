@@ -2,6 +2,7 @@
 
 #include <string>
 #include <list>
+#include <cmath>
 
 #if !defined(STRINGIFY) && !defined(_STRINGIFY)
 #define _STRINGIFY(x) #x
@@ -109,15 +110,6 @@ namespace zf_test
 			m_pairs.push_back(std::move(p));
 		}
 
-		void add(const test_result &other)
-		{
-			for (std::list<pair_t>::const_iterator p = other.m_pairs.begin();
-				 other.m_pairs.end() != p; ++p)
-			{
-				add(p->first.c_str(), p->second.c_str());
-			}
-		}
-
 		void fprint(FILE *const f, const char *const indent) const
 		{
 			for (std::list<pair_t>::const_iterator p = m_pairs.begin();
@@ -177,56 +169,25 @@ namespace zf_test
 			(void)argc; (void)argv;
 		}
 	};
-}
 
-#define TEST_VERIFY_THROW(result) \
-	do { \
-		throw zf_test::test_verify_exception(__FILE__, __LINE__, std::move(result)); \
-	} \
-	while (false)
+	class is_true {
+	public:
+		template <typename A>
+		bool operator()(const A &a) const
+		{
+			return a? true: false;
+		}
+	};
 
-#define TEST_VERIFY_TRUE(v) \
-	do { \
-		const bool t = v; \
-		if (!t) \
-		{ \
-			zf_test::test_result result("not true"); \
-			result.add("false", STRINGIFY(v));  \
-			TEST_VERIFY_THROW(result); \
-		} \
-	} \
-	while (false)
+	class is_false {
+	public:
+		template <typename A>
+		bool operator()(const A &a) const
+		{
+			return a? false: true;
+		}
+	};
 
-#define TEST_VERIFY_FALSE(v) \
-	do { \
-		const bool t = v; \
-		if (t) \
-		{ \
-			zf_test::test_result result("not false"); \
-			result.add("true", STRINGIFY(v));  \
-			TEST_VERIFY_THROW(result); \
-		} \
-	} \
-	while (false)
-
-#define TEST_VERIFY_IN_EPSILON(a, b, eps) \
-	do { \
-		const auto va = a; \
-		const auto vb = b; \
-		const auto veps = eps; \
-		if (veps <= std::abs(va - vb)) \
-		{ \
-			zf_test::test_result result("not in epsilon neighborhood"); \
-			result.add("left", strformat("%s (%s)", zf_test::to_string(va).c_str(), STRINGIFY(a)).c_str()); \
-			result.add("right", strformat("%s (%s)", zf_test::to_string(vb).c_str(), STRINGIFY(b)).c_str()); \
-			result.add("epsilon", strformat("%s (%s)", zf_test::to_string(veps).c_str(), STRINGIFY(eps)).c_str()); \
-			TEST_VERIFY_THROW(result); \
-		} \
-	} \
-	while (false)
-
-namespace zf_test
-{
 	class equal_to {
 	public:
 		template <typename A, typename B>
@@ -235,6 +196,40 @@ namespace zf_test
 			return a == b;
 		}
 	};
+
+	class not_equal_to {
+	public:
+		template <typename A, typename B>
+		bool operator()(const A &a, const B &b) const
+		{
+			return a != b;
+		}
+	};
+
+	template <typename E>
+	class in_epsilon {
+	public:
+		in_epsilon(const E &e): m_e(e) {}
+		template <typename A, typename B>
+		bool operator()(const A &a, const B &b) const
+		{
+			return m_e > std::abs(a - b);
+		}
+		const E m_e;
+	};
+
+	template <typename A, typename F>
+	void test_verify_predicate(const A &a, const char *const as,
+							   const F &f, const char *const message,
+							   const char *const fname, const unsigned fline)
+	{
+		if (!f(a))
+		{
+			zf_test::test_result result(message);
+			result.add("value", strformat("%s (%s)", zf_test::to_string(a).c_str(), as).c_str());
+			throw zf_test::test_verify_exception(fname, fline, result);
+		}
+	}
 
 	template <typename A, typename B, typename F>
 	void test_verify_relation(const A &a, const char *const as,
@@ -252,16 +247,32 @@ namespace zf_test
 	}
 }
 
-#define TEST_VERIFY_RELATION(a, b, relation, message) \
+#define TEST_VERIFY_PREDICATE(a, predicate, message) \
 	do { \
-		zf_test::test_verify_relation(a, STRINGIFY(a), b, STRINGIFY(b), zf_test::equal_to(), message, __FILE__, __LINE__); \
+		zf_test::test_verify_predicate(a, STRINGIFY(a), predicate, message, \
+									   __FILE__, __LINE__); \
 	} \
 	while (false)
 
+#define TEST_VERIFY_RELATION(a, b, relation, message) \
+	do { \
+		zf_test::test_verify_relation(a, STRINGIFY(a), b, STRINGIFY(b), \
+									  relation, message, \
+									  __FILE__, __LINE__); \
+	} \
+	while (false)
+
+#define TEST_VERIFY_TRUE(a) \
+	TEST_VERIFY_PREDICATE(a, zf_test::is_true(), "should, but not true")
+#define TEST_VERIFY_FALSE(a) \
+	TEST_VERIFY_PREDICATE(a, zf_test::is_false(), "should, but not false")
 #define TEST_VERIFY_EQUAL(a, b) \
-	TEST_VERIFY_RELATION(a, b, zf_test::equal_to, "not equal")
+	TEST_VERIFY_RELATION(a, b, zf_test::equal_to(), "should, but not equal")
 #define TEST_VERIFY_NOT_EQUAL(a, b) \
-	TEST_VERIFY_RELATION(a, b, std::not_equal_to<void>(), "equal")
+	TEST_VERIFY_RELATION(a, b, zf_test::not_equal_to(), "should not, but equal")
+#define TEST_VERIFY_IN_EPSILON(a, b, eps) \
+	TEST_VERIFY_RELATION(a, b, zf_test::in_epsilon(eps), "should, but not in epsilon neighborhood")
+/*
 #define TEST_VERIFY_LESS_OR_EQUAL(a, b) \
 	TEST_VERIFY_RELATION(a, b, std::less_equal<void>(), "not less or equal (<=)")
 #define TEST_VERIFY_LESS(a, b) \
@@ -270,6 +281,7 @@ namespace zf_test
 	TEST_VERIFY_RELATION(a, b, std::greater_equal<void>(), "not greater or equal (>=)")
 #define TEST_VERIFY_GREATER(a, b) \
 	TEST_VERIFY_RELATION(a, b, std::greater<void>(), "not greater (>)")
+*/
 
 #define TEST_RUNNER_CREATE(argc, argv) \
 	zf_test::test_runner test_runner_instance(argc, argv)
@@ -312,7 +324,7 @@ namespace zf_test
 		if (0 < test_runner_instance.verbosity) { \
 			fprintf(stderr, "suite: %s\n", test_runner_instance.suite_name); \
 		} \
-		s(test_runner_instance); \
+		(s)(test_runner_instance); \
 		test_runner_instance.suite_name = prev_suite_name; \
 	} \
 	while (false)
