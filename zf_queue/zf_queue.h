@@ -51,14 +51,14 @@
  * _first                       +       +       +       +
  * _last                        -       +       -       +
  * _next                        +       +       +       +
- * _prev                        -       -
- * _insert_head                 +       +
- * _insert_tail                 -       +
- * _insert_before               -       -
- * _insert_after                +       +
- * _remove                      -       -
- * _remove_head                 +       +
- * _remove_after                +       +
+ * _prev                        -       -       +       +
+ * _insert_head                 +       +       +       +
+ * _insert_tail                 -       +       -       +
+ * _insert_before               -       -       +       +
+ * _insert_after                +       +       +       +
+ * _remove                      -       -       +       +
+ * _remove_head                 +       +       -       -
+ * _remove_after                +       +       -       -
  * _concat                      -
  * _swap                        +
  *
@@ -171,34 +171,35 @@ struct zf_stailq_node
 
 struct zf_stailq_head
 {
-	zf_stailq_node *first;
+	zf_stailq_node first;
 	zf_stailq_node *last;
 };
 
-#define ZF_STAILQ_INITIALIZER {0, 0}
+#define ZF_STAILQ_INITIALIZER(h) {{0}, &(h)->first}
 
 _ZF_QUEUE_DECL
 void zf_stailq_init(zf_stailq_head *const h)
 {
-	h->first = h->last = 0;
+	h->first.next = 0;
+	h->last = &h->first;
 }
 
 _ZF_QUEUE_DECL
 bool zf_stailq_empty(zf_stailq_head *const h)
 {
-	return 0 == h->first;
+	return 0 == h->first.next;
 }
 
 _ZF_QUEUE_DECL
 zf_stailq_node *zf_stailq_first(zf_stailq_head *const h)
 {
-	return h->first;
+	return h->first.next;
 }
 
 _ZF_QUEUE_DECL
 zf_stailq_node *zf_stailq_last(zf_stailq_head *const h)
 {
-	return h->last;
+	return 0 == h->first.next? 0: h->last;
 }
 
 _ZF_QUEUE_DECL
@@ -210,26 +211,19 @@ zf_stailq_node *zf_stailq_next(zf_stailq_node *const n)
 _ZF_QUEUE_DECL
 void zf_stailq_insert_head(zf_stailq_head *const h, zf_stailq_node *const n)
 {
-	if (0 == (n->next = h->first))
+	if (0 == (n->next = h->first.next))
 	{
 		h->last = n;
 	}
-	h->first = n;
+	h->first.next = n;
 }
 
 _ZF_QUEUE_DECL
 void zf_stailq_insert_tail(zf_stailq_head *const h, zf_stailq_node *const n)
 {
 	n->next = 0;
-	if (0 == h->first)
-	{
-		h->first = h->last = n;
-	}
-	else
-	{
-		h->last->next = n;
-		h->last = n;
-	}
+	h->last->next = n;
+	h->last = n;
 }
 
 _ZF_QUEUE_DECL
@@ -246,9 +240,9 @@ void zf_stailq_insert_after(zf_stailq_head *const h, zf_stailq_node *const p,
 _ZF_QUEUE_DECL
 void zf_stailq_remove_head(zf_stailq_head *const h)
 {
-	if (0 == (h->first = h->first->next))
+	if (0 == (h->first.next = h->first.next->next))
 	{
-		h->last = 0;
+		h->last = &h->first;
 	}
 }
 
@@ -277,5 +271,192 @@ struct zf_list_head
 
 #define ZF_LIST_INITIALIZER {0}
 
+_ZF_QUEUE_DECL
+void zf_list_init(zf_list_head *const h)
+{
+	h->first = 0;
+}
+
+_ZF_QUEUE_DECL
+bool zf_list_empty(zf_list_head *const h)
+{
+	return 0 == h->first;
+}
+
+_ZF_QUEUE_DECL
+zf_list_node *zf_list_first(zf_list_head *const h)
+{
+	return h->first;
+}
+
+_ZF_QUEUE_DECL
+zf_list_node *zf_list_prev(zf_list_head *const h, zf_list_node *const n)
+{
+	return n->pprev == &h->first? 0:
+			(zf_list_node *)((char *)n->pprev - offsetof(zf_list_node, next));
+}
+
+_ZF_QUEUE_DECL
+zf_list_node *zf_list_next(zf_list_node *const n)
+{
+	return n->next;
+}
+
+_ZF_QUEUE_DECL
+void zf_list_insert_head(zf_list_head *const h, zf_list_node *const n)
+{
+	if (0 != (n->next = h->first))
+	{
+		h->first->pprev = &n->next;
+	}
+	h->first = n;
+	n->pprev = &h->first;
+}
+
+_ZF_QUEUE_DECL
+void zf_list_insert_before(zf_list_node *const p, zf_list_node *const n)
+{
+	n->pprev = p->pprev;
+	n->next = p;
+	*p->pprev = n;
+	p->pprev = &n->next;
+}
+
+_ZF_QUEUE_DECL
+void zf_list_insert_after(zf_list_node *const p, zf_list_node *const n)
+{
+	if (0 != (n->next = p->next))
+	{
+		p->next->pprev = &n->next;
+	}
+	p->next = n;
+	n->pprev = &p->next;
+}
+
+_ZF_QUEUE_DECL
+void zf_list_remove(zf_list_node *const n)
+{
+	if (0 != n->next)
+	{
+		n->next->pprev = n->pprev;
+	}
+	*n->pprev = n->next;
+}
+
+/*
+ * Tail queue
+ */
+struct zf_tailq_node
+{
+	zf_tailq_node *next;
+	zf_tailq_node *prev;
+};
+
+struct zf_tailq_head
+{
+	zf_tailq_node head;
+};
+
+#define ZF_TAILQ_INITIALIZER(h) {{0, &(h)->head}}
+
+_ZF_QUEUE_DECL
+void zf_tailq_init(zf_tailq_head *const h)
+{
+	h->head.next = 0;
+	h->head.prev = &h->head;
+}
+
+_ZF_QUEUE_DECL
+bool zf_tailq_empty(zf_tailq_head *const h)
+{
+	return 0 == h->head.next;
+}
+
+_ZF_QUEUE_DECL
+zf_tailq_node *zf_tailq_first(zf_tailq_head *const h)
+{
+	return h->head.next;
+}
+
+_ZF_QUEUE_DECL
+zf_tailq_node *zf_tailq_last(zf_tailq_head *const h)
+{
+	return h->head.prev->prev->next;
+}
+
+_ZF_QUEUE_DECL
+zf_tailq_node *zf_tailq_next(zf_tailq_node *const n)
+{
+	return n->next;
+}
+
+_ZF_QUEUE_DECL
+zf_tailq_node *zf_tailq_prev(zf_tailq_node *const n)
+{
+	return n->prev->prev->next;
+}
+
+_ZF_QUEUE_DECL
+void zf_tailq_insert_head(zf_tailq_head *const h, zf_tailq_node *const n)
+{
+	if (0 != (n->next = h->head.next))
+	{
+		h->head.next->prev = n;
+	}
+	else
+	{
+		h->head.prev = n;
+	}
+	h->head.next = n;
+	n->prev = &(h->head);
+}
+
+_ZF_QUEUE_DECL
+void zf_tailq_insert_tail(zf_tailq_head *const h, zf_tailq_node *const n)
+{
+	n->next = 0;
+	n->prev = h->head.prev;
+	h->head.prev->next = n;
+	h->head.prev = n;
+}
+
+_ZF_QUEUE_DECL
+void zf_tailq_insert_before(zf_tailq_node *const p, zf_tailq_node *const n)
+{
+	n->next = p;
+	n->prev = p->prev;
+	p->prev->next = n;
+	p->prev = n;
+}
+
+_ZF_QUEUE_DECL
+void zf_tailq_insert_after(zf_tailq_head *const h, zf_tailq_node *const p,
+						   zf_tailq_node *const n)
+{
+	if (0 != (n->next = p->next))
+	{
+		n->next->prev = n;
+	}
+	else
+	{
+		h->head.prev = n;
+	}
+	p->next = n;
+	n->prev = p;
+}
+
+_ZF_QUEUE_DECL
+void zf_tailq_remove(zf_tailq_head *const h, zf_tailq_node *const n)
+{
+	if (0 != n->next)
+	{
+		n->next->prev = n->prev;
+	}
+	else
+	{
+		h->head.prev = n->prev;
+	}
+	n->prev->next = n->next;
+}
 
 #endif
