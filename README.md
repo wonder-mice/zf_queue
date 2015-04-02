@@ -1,10 +1,12 @@
 zf_queue
 ========
 
-About
---------
-This is a blend of classic BSD's [sys/queue.h] design with [linux/list.h] implementation.
-As a bonus, library provides binary compatible C++ interface.
+This is a blend of classic BSD [sys/queue.h] design with Linux [linux/list.h] implementation.
+BSD implementation has a nice variaty of primitives (list, slist, tailq, stailq), but it uses
+macros. Linux implementation less reach and has GPL license, but uses functions (more type
+safety, better error messages) and has interesting design. This library tries to take the
+best from both and mix it under BSD-style license.
+It addition to C implementation, it also provides binary compatible C++ interface.
 
 [sys/queue.h]: https://svnweb.freebsd.org/base/head/sys/sys/queue.h
 [linux/list.h]: https://github.com/torvalds/linux/blob/master/include/linux/list.h
@@ -12,12 +14,39 @@ As a bonus, library provides binary compatible C++ interface.
 Usage
 --------
 
-1. Embeding
-2. Embeding with CMake
-3. Installation
-4. Installation with CMake
+This header-only library has two headers:
+* [zf_queue.h](../blob/master/zf_queue/zf_queue.h) - C implementation
+* [zf_queue.hpp](../blob/master/zf_queue/zf_queue.hpp) C++ interface
 
-This is a blend of classic BSD's [sys/queue.h] design with [linux/list.h] implementation.
+For C only the first one is necessary. For C++ you need both.
+
+### Embedding
+
+Put [zf_queue.h](../blob/master/zf_queue/zf_queue.h) into your source tree.
+For C++ also add [zf_queue.hpp](../blob/master/zf_queue/zf_queue.hpp). Include as usual:
+```c
+#include "zf_queue.h"
+```
+
+### Embeding with CMake
+
+Put [zf_queue](../blob/master/zf_queue) directory into your CMake project.
+Add the following to CMakeLists.txt in parent directory:
+```cmake
+add_subdirectory(zf_queue)
+```
+
+Then add the following to CMakeLists.txt for each target that uses zf_queue:
+```cmake
+target_link_libraries(some_target_name zf_queue)
+```
+
+Include as usual:
+```c
+#include "zf_queue.h"
+```
+
+### Installation
 
 Library consists of single standalone header file:
 [zf_queue/zf_queue.h](../blob/master/zf_queue/zf_queue.h)
@@ -83,3 +112,9 @@ int main()
 	printf("Last: %i\n", TAILQ_LAST(&loop, EventQueue)->what);
 }
 ```
+
+Why zf?
+--------
+
+It stands for Ze Foundation. "Ze" is like "The" but with french or german accent.
+Mostly because zf_anything looks better than tf_anything.
