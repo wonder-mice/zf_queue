@@ -1,9 +1,16 @@
 zf_queue
 ========
 
-Modern implementation of classic BSD's sys/queue.h
+About
+--------
+This is a blend of classic BSD's [sys/queue.h] design with [linux/list.h] implementation. 
+As a bonus, library provides binary compatible C++ interface.
 
-Library consists of single standalone header file: include/zf_queue.hpp
+[sys/queue.h]: https://svnweb.freebsd.org/base/head/sys/sys/queue.h
+[linux/list.h]: https://github.com/torvalds/linux/blob/master/include/linux/list.h
+
+Library consists of single standalone header file:
+[zf_queue/zf_queue.h](../blob/master/zf_queue/zf_queue.h)
 
 Following example uses zf_queue.hpp:
 ```c++
