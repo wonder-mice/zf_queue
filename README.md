@@ -6,7 +6,7 @@ BSD implementation has a nice variaty of primitives (list, slist, tailq, stailq)
 macros. Linux implementation less reach and has GPL license, but uses functions (more type
 safety, better error messages) and has interesting design. This library tries to take the
 best from both and mix it under BSD-style license.
-It addition to C implementation, it also provides binary compatible C++ interface.
+In addition to C implementation, it also provides binary compatible C++ interface.
 
 [sys/queue.h]: https://svnweb.freebsd.org/base/head/sys/sys/queue.h
 [linux/list.h]: https://github.com/torvalds/linux/blob/master/include/linux/list.h
@@ -15,30 +15,30 @@ Usage
 --------
 
 This header-only library has two headers:
-* [zf_queue.h](../blob/master/zf_queue/zf_queue.h) - C implementation
-* [zf_queue.hpp](../blob/master/zf_queue/zf_queue.hpp) C++ interface
+* [zf_queue.h](zf_queue/zf_queue.h) - C implementation
+* [zf_queue.hpp](zf_queue/zf_queue.hpp) - C++ interface
 
 For C only the first one is necessary. For C++ you need both.
 
 ### Embedding
 
-Put [zf_queue.h](../blob/master/zf_queue/zf_queue.h) into your source tree.
-For C++ also add [zf_queue.hpp](../blob/master/zf_queue/zf_queue.hpp). Include as usual:
+Put [zf_queue.h](zf_queue/zf_queue.h) into your source tree.
+For C++ also add [zf_queue.hpp](zf_queue/zf_queue.hpp). Include as usual:
 ```c
 #include "zf_queue.h"
 ```
 
 ### Embeding with CMake
 
-Put [zf_queue](../blob/master/zf_queue) directory into your CMake project.
-Add the following to CMakeLists.txt in parent directory:
+Put [zf_queue](zf_queue) directory into your source tree.
+In CMakeLists.txt inside parent directory add:
 ```cmake
 add_subdirectory(zf_queue)
 ```
 
-Then add the following to CMakeLists.txt for each target that uses zf_queue:
+For each target that uses zf_queue in corresponding CMakeLists.txt file add:
 ```cmake
-target_link_libraries(some_target_name zf_queue)
+target_link_libraries(my_target zf_queue)
 ```
 
 Include as usual:
@@ -48,8 +48,30 @@ Include as usual:
 
 ### Installation
 
-Library consists of single standalone header file:
-[zf_queue/zf_queue.h](../blob/master/zf_queue/zf_queue.h)
+```bash
+git clone https://github.com/wonder-mice/zf_queue.git zf_queue.git
+mkdir zf_queue.build && cd zf_queue.build
+cmake ../zf_queue.git -DCMAKE_INSTALL_PREFIX=/usr/local
+make && make install
+```
+
+This will also install
+`${CMAKE_INSTALL_PREFIX}/lib/cmake/zf_queue/zf_queue.cmake`
+and
+`${CMAKE_INSTALL_PREFIX}/lib/cmake/zf_queue/zf_queue-config.cmake`.
+The first one is for direct `include` from CMakeLists.txt file.
+The second can be located by CMake with:
+```cmake
+find_package(zf_queue)
+```
+Both will add `zf_queue` imported interface library target.
+For each target that uses zf_queue in corresponding CMakeLists.txt file add:
+```cmake
+target_link_libraries(my_target zf_queue)
+```
+
+Examples
+--------
 
 Following example uses zf_queue.hpp:
 ```c++
