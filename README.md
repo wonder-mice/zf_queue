@@ -3,11 +3,21 @@ zf_queue
 
 About
 --------
-This is a blend of classic BSD's [sys/queue.h] design with [linux/list.h] implementation. 
+This is a blend of classic BSD's [sys/queue.h] design with [linux/list.h] implementation.
 As a bonus, library provides binary compatible C++ interface.
 
 [sys/queue.h]: https://svnweb.freebsd.org/base/head/sys/sys/queue.h
 [linux/list.h]: https://github.com/torvalds/linux/blob/master/include/linux/list.h
+
+Usage
+--------
+
+1. Embeding
+2. Embeding with CMake
+3. Installation
+4. Installation with CMake
+
+This is a blend of classic BSD's [sys/queue.h] design with [linux/list.h] implementation.
 
 Library consists of single standalone header file:
 [zf_queue/zf_queue.h](../blob/master/zf_queue/zf_queue.h)
