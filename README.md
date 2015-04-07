@@ -14,16 +14,13 @@ In addition to C implementation, it also provides binary compatible C++ interfac
 Usage
 --------
 
-This header-only library has two headers:
-* [zf_queue.h](zf_queue/zf_queue.h) - C implementation
-* [zf_queue.hpp](zf_queue/zf_queue.hpp) - C++ interface
-
-For C only the first one is necessary. For C++ you need both.
+This header-only library has single header file:
+* [zf_queue.h](zf_queue/zf_queue.h)
 
 ### Embedding
 
 Put [zf_queue.h](zf_queue/zf_queue.h) into your source tree.
-For C++ also add [zf_queue.hpp](zf_queue/zf_queue.hpp). Include as usual:
+Include as usual:
 ```c
 #include "zf_queue.h"
 ```
@@ -73,9 +70,9 @@ target_link_libraries(my_target zf_queue)
 Examples
 --------
 
-Following example uses zf_queue.hpp:
+Following example uses zf_queue.h:
 ```c++
-#include "zf_queue.hpp"
+#include "zf_queue.h"
 
 struct Event
 {

@@ -19,8 +19,6 @@ endif()
 
 # dummy target to add headers to IDE files tree (optional)
 if(NOT ZF_QUEUE_NO_SOURCES)
-	set(HEADERS
-		zf_queue.h
-		zf_queue.hpp)
+	set(HEADERS zf_queue.h)
 	add_custom_target(zf_queue_headers SOURCES ${HEADERS})
 endif()

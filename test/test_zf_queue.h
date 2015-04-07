@@ -2,7 +2,6 @@
 
 #include "zf_test.hpp"
 #include "zf_queue.h"
-#include "zf_queue.hpp"
 
 /*
  * Singly-linked list
