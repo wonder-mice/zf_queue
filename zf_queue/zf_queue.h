@@ -642,10 +642,10 @@ void zf_tailq_foreach_(zf_tailq_head_<T, node> *const h, F f)
 	#define zf_stailq_head_t(T, node) zf_stailq_head_<T, node>
 	#define zf_tailq_head_t(T, node) zf_tailq_head_<T, node>
 #else
-	#define zf_slist_head_t(T, node) zf_slist_head_t
-	#define zf_list_head_t(T, node) zf_list_head_t
-	#define zf_stailq_head_t(T, node) zf_stailq_head_t
-	#define zf_tailq_head_t(T, node) zf_tailq_head_t
+	#define zf_slist_head_t(T, node) zf_slist_head
+	#define zf_list_head_t(T, node) zf_list_head
+	#define zf_stailq_head_t(T, node) zf_stailq_head
+	#define zf_tailq_head_t(T, node) zf_tailq_head
 #endif
 
 #endif // _ZF_QUEUE_H_
