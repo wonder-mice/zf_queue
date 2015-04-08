@@ -92,15 +92,18 @@ struct line
 {
     zf_tailq_node node;
 };
-zf_tailq_head_t(line, &line::node) lines;
+// Declaration with C interface
+zf_tailq_head lines;
+// Declaration with C++ interface
+zf_tailq_head_<line, &line::node> lines;
 line line1;
 // Add item with C interface
 zf_tailq_insert_head(&lines, &line1.node);
 // Add item with C++ interface
 zf_tailq_insert_head_(&lines, &line1);
-// Getting item with C interface
+// Get item with C interface
 zf_entry(zf_tailq_last(&lines), line, node);
-// Getting item with C++ interface
+// Get item with C++ interface
 zf_tailq_last_(&lines);
 ```
 
