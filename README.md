@@ -1,12 +1,13 @@
 zf_queue
 ========
 
-This is a blend of classic BSD [sys/queue.h] design with Linux [linux/list.h] implementation.
-BSD implementation has a nice variaty of primitives (list, slist, tailq, stailq), but it uses
-macros. Linux implementation less reach and has GPL license, but uses functions (more type
-safety, better error messages) and has interesting design. This library tries to take the
-best from both and mix it under BSD-style license.
-In addition to C implementation, it also provides binary compatible C++ interface.
+This is a blend of classic BSD [sys/queue.h] design with Linux [linux/list.h]
+implementation. BSD implementation has a nice variety of primitives (list,
+slist, tailq, stailq), but it uses macros. Linux implementation less reach and
+has GPL license, but uses functions (more type safety, better error messages)
+and has some interesting optimizations. This library tries to take the best from
+both and mix it under BSD-style license. In addition to C implementation, it
+also provides binary compatible C++ interface.
 
 [sys/queue.h]: https://svnweb.freebsd.org/base/head/sys/sys/queue.h
 [linux/list.h]: https://github.com/torvalds/linux/blob/master/include/linux/list.h
@@ -14,31 +15,35 @@ In addition to C implementation, it also provides binary compatible C++ interfac
 Usage
 --------
 
-This header-only library has single header file:
-* [zf_queue.h](zf_queue/zf_queue.h)
+This is a header-only library. It contains single header file
+[zf_queue.h](zf_queue/zf_queue.h).
 
 ### Embedding
 
 Put [zf_queue.h](zf_queue/zf_queue.h) into your source tree.
 Include as usual:
+
 ```c
 #include "zf_queue.h"
 ```
 
-### Embeding with CMake
+### Embedding with CMake
 
 Put [zf_queue](zf_queue) directory into your source tree.
 In CMakeLists.txt inside parent directory add:
+
 ```cmake
 add_subdirectory(zf_queue)
 ```
 
 For each target that uses zf_queue in corresponding CMakeLists.txt file add:
+
 ```cmake
 target_link_libraries(my_target zf_queue)
 ```
 
 Include as usual:
+
 ```c
 #include "zf_queue.h"
 ```
@@ -58,11 +63,14 @@ and
 `${CMAKE_INSTALL_PREFIX}/lib/cmake/zf_queue/zf_queue-config.cmake`.
 The first one is for direct `include` from CMakeLists.txt file.
 The second can be located by CMake with:
+
 ```cmake
 find_package(zf_queue)
 ```
+
 Both will add `zf_queue` imported interface library target.
 For each target that uses zf_queue in corresponding CMakeLists.txt file add:
+
 ```cmake
 target_link_libraries(my_target zf_queue)
 ```
@@ -70,67 +78,11 @@ target_link_libraries(my_target zf_queue)
 Examples
 --------
 
-Following example uses zf_queue.h:
-```c++
-#include "zf_queue.h"
+Below is a list of examples:
 
-struct Event
-{
-	int what;
-	zf_tailq_entry<Event> entry;
-};
+* [slist_args.c](test/example/slist_args.c) - singly-linked list in C
+* [slist_args.cpp](test/example/slist_args.cpp) - singly-linked list in C++
 
-struct Loop
-{
-	zf_tailq_head<Event, &Event::entry> events;
-};
-
-int main()
-{
-	Loop loop;
-	Event event1;
-	event1.what = 1;
-	zf_tailq_insert_tail(&loop, &event1);
-	Event event2;
-	event2.what = 2;
-	zf_tailq_insert_tail(&loop, &event2);
-	printf("First: %i\n", zf_tailq_first(&loop)->what);
-	printf("Last: %i\n", zf_tailq_last(&loop)->what);
-}
-```
-This example uses classic queue.h. Notice that name of entry field must be specified explicitly for TAILQ_INSERT_TAIL and TAILQ_LAST requires the name of the structure that holds list head:
-```c
-#include "queue.h"
-
-struct Event
-{
-	int what;
-	TAILQ_ENTRY(Event) entry;
-};
-
-TAILQ_HEAD(EventQueue, Event);
-
-struct Loop
-{
-	EventQueue events;
-};
-
-int main()
-{
-	Loop loop;
-	Event event1;
-	event1.what = 1;
-	// Need to specify entry field name
-	TAILQ_INSERT_TAIL(&loop, &event1, entry);
-	Event event2;
-	event2.what = 2;
-	// Need to specify entry field name
-	TAILQ_INSERT_TAIL(&loop, &event2, entry);
-	printf("First: %i\n", TAILQ_FIRST(&loop)->what);
-	// Need to specify head type name (EventQueue)
-	printf("Last: %i\n", TAILQ_LAST(&loop, EventQueue)->what);
-}
-```
 
 Why zf?
 --------
