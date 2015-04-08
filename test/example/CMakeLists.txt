@@ -5,3 +5,6 @@ target_link_libraries(slist_args_c zf_queue)
 
 add_executable(slist_args_cpp slist_args.cpp)
 target_link_libraries(slist_args_cpp zf_queue)
+
+add_executable(tailq_c_vs_cpp tailq_c_vs_cpp.cpp)
+target_link_libraries(tailq_c_vs_cpp zf_queue)

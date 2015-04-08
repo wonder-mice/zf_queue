@@ -5,12 +5,12 @@
 typedef struct arg_entry
 {
 	const char *value;
-	zf_slist_node_t slist_node;
+	zf_slist_node slist_node;
 } arg_entry_t;
 
 int main(int argc, char *argv[])
 {
-	zf_slist_head_t args = ZF_LIST_INITIALIZER;
+	zf_slist_head args = ZF_LIST_INITIALIZER;
 	for (int i = 0; argc > i; ++i)
 	{
 		arg_entry_t *const arg = (arg_entry_t *)malloc(sizeof(arg_entry_t));
@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 	}
 	while (!zf_slist_empty(&args))
 	{
-		zf_slist_node_t *const node = zf_slist_first(&args);
+		zf_slist_node *const node = zf_slist_first(&args);
 		arg_entry_t *const arg = zf_entry(node, arg_entry_t, slist_node);
 		zf_slist_remove_head(&args);
 		printf("arg: \"%s\"\n", arg->value);

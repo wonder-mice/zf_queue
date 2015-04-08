@@ -82,7 +82,27 @@ Below is a list of examples:
 
 * [slist_args.c](test/example/slist_args.c) - singly-linked list in C
 * [slist_args.cpp](test/example/slist_args.cpp) - singly-linked list in C++
+* [tailq_c_vs_cpp](test/example/tailq_c_vs_cpp.cpp) - tail queue C and C++
+  interface comparison
 
+C++ and C interfaces are almost identical, the main difference is that C++
+interface operates in terms of entries instead of nodes. Consider:
+```c++
+struct line
+{
+    zf_tailq_node node;
+};
+zf_tailq_head_t(line, &line::node) lines;
+line line1;
+// Add item with C interface
+zf_tailq_insert_head(&lines, &line1.node);
+// Add item with C++ interface
+zf_tailq_insert_head_(&lines, &line1);
+// Getting item with C interface
+zf_entry(zf_tailq_last(&lines), line, node);
+// Getting item with C++ interface
+zf_tailq_last_(&lines);
+```
 
 Why zf?
 --------
