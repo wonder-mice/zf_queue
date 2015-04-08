@@ -88,15 +88,15 @@
 /*
  * Singly-linked list
  */
-struct zf_slist_node
+typedef struct zf_slist_node
 {
 	struct zf_slist_node *next;
-};
+} zf_slist_node_t;
 
-struct zf_slist_head
+typedef struct zf_slist_head
 {
 	struct zf_slist_node *first;
-};
+} zf_slist_head_t;
 
 #define ZF_SLIST_INITIALIZER {0}
 
@@ -488,23 +488,51 @@ Entry *zf_entry_(Node *const node, Node Entry::* field)
 }
 
 /*
+ * List
+ */
+template <typename T, zf_list_node T:: *node>
+struct zf_list_head_: zf_list_head
+{
+	zf_list_head_(const zf_list_head &h): zf_list_head(h) {}
+};
+
+template <typename T, zf_list_node T:: *node>
+T *zf_list_first_(zf_list_head_<T, node> *const h)
+{
+	return zf_entry_(zf_list_first(h), node);
+}
+
+template <typename T, zf_list_node T:: *node>
+void zf_list_insert_head_(zf_list_head_<T, node> *const h, T *const e)
+{
+	zf_list_insert_head(h,  &(e->*node));
+}
+
+/*
  * Singly-linked list
  */
 template <typename T, zf_slist_node T:: *node>
 struct zf_slist_head_: zf_slist_head
 {
+	zf_slist_head_(const zf_slist_head &h): zf_slist_head(h) {}
 };
 
 template <typename T, zf_slist_node T:: *node>
 T *zf_slist_first_(zf_slist_head_<T, node> *const h)
 {
-	return zf_entry_(zf_slist_first(&h), node);
+	return zf_entry_(zf_slist_first(h), node);
 }
 
 template <typename T, zf_slist_node T:: *node>
 T *zf_slist_next_(const zf_slist_head_<T, node> *const, T *const e)
 {
 	return zf_entry_(zf_slist_next(&(e->*node)), node);
+}
+
+template <typename T, zf_slist_node T:: *node>
+void zf_slist_insert_head_(zf_slist_head_<T, node> *const h, T *const e)
+{
+	zf_slist_insert_head(h, &(e->*node));
 }
 
 /*
