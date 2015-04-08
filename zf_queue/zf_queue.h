@@ -91,12 +91,12 @@
 typedef struct zf_slist_node
 {
 	struct zf_slist_node *next;
-} zf_slist_node_t;
+} zf_slist_node;
 
 typedef struct zf_slist_head
 {
 	struct zf_slist_node *first;
-} zf_slist_head_t;
+} zf_slist_head;
 
 #define ZF_SLIST_INITIALIZER {0}
 
@@ -266,12 +266,12 @@ typedef struct zf_list_node
 {
 	struct zf_list_node *next;
 	struct zf_list_node **pprev;
-} zf_list_node_t;
+} zf_list_node;
 
 typedef struct zf_list_head
 {
 	struct zf_list_node *first;
-} zf_list_head_t;
+} zf_list_head;
 
 #define ZF_LIST_INITIALIZER {0}
 
@@ -297,8 +297,8 @@ _ZF_QUEUE_DECL
 struct zf_list_node *zf_list_prev(struct zf_list_head *const h,
 								  struct zf_list_node *const n)
 {
-	return n->pprev == &h->first? 0: (zf_list_node_t *)
-			((char *)n->pprev - offsetof(zf_list_node_t, next));
+	return n->pprev == &h->first? 0: (zf_list_node *)
+			((char *)n->pprev - offsetof(zf_list_node, next));
 }
 
 _ZF_QUEUE_DECL
@@ -358,12 +358,12 @@ typedef struct zf_tailq_node
 {
 	struct zf_tailq_node *next;
 	struct zf_tailq_node *prev;
-} zf_tailq_node_t;
+} zf_tailq_node;
 
 typedef struct zf_tailq_head
 {
 	struct zf_tailq_node head;
-} zf_tailq_head_t;
+} zf_tailq_head;
 
 #define ZF_TAILQ_INITIALIZER(h) {{0, &(h)->head}}
 
@@ -493,6 +493,7 @@ Entry *zf_entry_(Node *const node, Node Entry::* field)
 template <typename T, zf_list_node T:: *node>
 struct zf_list_head_: zf_list_head
 {
+	zf_list_head_() {}
 	zf_list_head_(const zf_list_head &h): zf_list_head(h) {}
 };
 
@@ -514,7 +515,8 @@ void zf_list_insert_head_(zf_list_head_<T, node> *const h, T *const e)
 template <typename T, zf_slist_node T:: *node>
 struct zf_slist_head_: zf_slist_head
 {
-	zf_slist_head_(const zf_slist_head &h): zf_slist_head(h) {}
+	zf_slist_head_() {}
+	zf_slist_head_(zf_slist_node *const f) { first = f; }
 };
 
 template <typename T, zf_slist_node T:: *node>
@@ -539,7 +541,10 @@ void zf_slist_insert_head_(zf_slist_head_<T, node> *const h, T *const e)
  * Tail queue
  */
 template <typename T, zf_tailq_node T:: *node>
-struct zf_tailq_head_: zf_tailq_head {};
+struct zf_tailq_head_: zf_tailq_head {
+	zf_tailq_head_() {}
+	zf_tailq_head_(const zf_tailq_node &h) { head = h; }
+};
 
 template <typename T, zf_tailq_node T:: *node>
 T *zf_tailq_entry_(zf_tailq_head_<T, node> *const, zf_tailq_node *const n)
@@ -624,18 +629,18 @@ void zf_tailq_foreach_(zf_tailq_head_<T, node> *const h, F f)
  * Example:
  *   // file: foo.h
  *   struct foo_entry {
- *       zf_tailq_node_t node;
+ *       zf_tailq_node node;
  *   };
  *   struct foo {
- *       zf_tailq_head_tm(foo_entry, &foo_entry::node) head;
+ *       zf_tailq_head_t(foo_entry, &foo_entry::node) head;
  *   };
  * That way foo.h can be included in both C and C++ source files.
  */
 #ifdef __cplusplus
-	#define zf_slist_head_tm(T, node) zf_slist_head_<T, node>
-	#define zf_list_head_tm(T, node) zf_list_head_<T, node>
-	#define zf_stailq_head_tm(T, node) zf_stailq_head_<T, node>
-	#define zf_tailq_head_tm(T, node) zf_tailq_head_<T, node>
+	#define zf_slist_head_t(T, node) zf_slist_head_<T, node>
+	#define zf_list_head_t(T, node) zf_list_head_<T, node>
+	#define zf_stailq_head_t(T, node) zf_stailq_head_<T, node>
+	#define zf_tailq_head_t(T, node) zf_tailq_head_<T, node>
 #else
 	#define zf_slist_head_tm(T, node) zf_slist_head_t
 	#define zf_list_head_tm(T, node) zf_list_head_t
