@@ -97,7 +97,8 @@ zf_slist_node;
 typedef struct zf_slist_head
 {
 	struct zf_slist_node *first;
-} zf_slist_head;
+}
+zf_slist_head;
 
 #define ZF_SLIST_INITIALIZER {0}
 
@@ -165,16 +166,18 @@ void zf_slist_swap(struct zf_slist_head *const h1,
 /*
  * Singly-linked tail queue
  */
-struct zf_stailq_node
+typedef struct zf_stailq_node
 {
 	struct zf_stailq_node *next;
-};
+}
+zf_stailq_node;
 
-struct zf_stailq_head
+typedef struct zf_stailq_head
 {
 	struct zf_stailq_node first;
 	struct zf_stailq_node *last;
-};
+}
+zf_stailq_head;
 
 #define ZF_STAILQ_INITIALIZER(h) {{0}, &(h)->first}
 
@@ -267,12 +270,14 @@ typedef struct zf_list_node
 {
 	struct zf_list_node *next;
 	struct zf_list_node **pprev;
-} zf_list_node;
+}
+zf_list_node;
 
 typedef struct zf_list_head
 {
 	struct zf_list_node *first;
-} zf_list_head;
+}
+zf_list_head;
 
 #define ZF_LIST_INITIALIZER {0}
 
@@ -359,12 +364,14 @@ typedef struct zf_tailq_node
 {
 	struct zf_tailq_node *next;
 	struct zf_tailq_node *prev;
-} zf_tailq_node;
+}
+zf_tailq_node;
 
 typedef struct zf_tailq_head
 {
 	struct zf_tailq_node head;
-} zf_tailq_head;
+}
+zf_tailq_head;
 
 #define ZF_TAILQ_INITIALIZER(h) {{0, &(h)->head}}
 
@@ -489,7 +496,7 @@ Entry *zf_entry_(Node *const node, Node Entry::* field)
 }
 
 /*
- * List
+ * List C++ support
  */
 template <typename T, zf_list_node T:: *node>
 struct zf_list_head_: zf_list_head
@@ -511,7 +518,7 @@ void zf_list_insert_head_(zf_list_head_<T, node> *const h, T *const e)
 }
 
 /*
- * Singly-linked list
+ * Singly-linked list C++ support
  */
 template <typename T, zf_slist_node T:: *node>
 struct zf_slist_head_: zf_slist_head
@@ -539,7 +546,7 @@ void zf_slist_insert_head_(zf_slist_head_<T, node> *const h, T *const e)
 }
 
 /*
- * Tail queue
+ * Tail queue C++ support
  */
 template <typename T, zf_tailq_node T:: *node>
 struct zf_tailq_head_: zf_tailq_head {
