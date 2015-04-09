@@ -91,7 +91,8 @@
 typedef struct zf_slist_node
 {
 	struct zf_slist_node *next;
-} zf_slist_node;
+}
+zf_slist_node;
 
 typedef struct zf_slist_head
 {

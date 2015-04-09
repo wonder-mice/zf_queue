@@ -88,23 +88,32 @@ Below is a list of examples:
 C++ and C interfaces are almost identical, the main difference is that C++
 interface operates in terms of entries instead of nodes. Consider:
 ```c++
-struct line
+typedef struct line_t
 {
     zf_tailq_node node;
-};
+}
+line_t;
 // Declaration with C interface
-zf_tailq_head lines;
+zf_tailq_head line_list;
 // Declaration with C++ interface
-zf_tailq_head_<line, &line::node> lines;
-line line1;
+zf_tailq_head_<line_t, &line_t::node> line_list;
+// Declaration for both C and C++, in C source files will expand to
+//     zf_tailq_head line_list;
+// and in C++ source files will expand to
+//     zf_tailq_head_<line_t, &line_t::node> line_list;
+zf_tailq_head_t(line_t, &line_t::node) line_list;
+
+line_t aline;
+
 // Add item with C interface
-zf_tailq_insert_head(&lines, &line1.node);
+zf_tailq_insert_head(&line_list, &aline.node);
 // Add item with C++ interface
-zf_tailq_insert_head_(&lines, &line1);
+zf_tailq_insert_head_(&line_list, &aline);
+
 // Get item with C interface
-zf_entry(zf_tailq_last(&lines), line, node);
+zf_entry(zf_tailq_last(&line_list), line_t, node);
 // Get item with C++ interface
-zf_tailq_last_(&lines);
+zf_tailq_last_(&line_list);
 ```
 
 Why zf?
