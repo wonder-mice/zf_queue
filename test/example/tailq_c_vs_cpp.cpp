@@ -17,7 +17,7 @@ struct line_storage
     zf_tailq_head_<line_entry, &line_entry::node_cpp> lines_cpp;
     // Declaration below can be used in headers that are included by both
     // C and C++ source files
-    zf_tailq_head_t(line_entry, &line_entry::node_mixed) lines_mixed;
+    zf_tailq_head_t(line_entry, node_mixed) lines_mixed;
 };
 
 int main(int argc, char *argv[])

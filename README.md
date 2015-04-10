@@ -101,7 +101,7 @@ zf_tailq_head_<line_t, &line_t::node> line_list;
 //     zf_tailq_head line_list;
 // and in C++ source files will expand to
 //     zf_tailq_head_<line_t, &line_t::node> line_list;
-zf_tailq_head_t(line_t, &line_t::node) line_list;
+zf_tailq_head_t(line_t, node) line_list;
 
 line_t aline;
 

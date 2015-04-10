@@ -666,15 +666,15 @@ void zf_tailq_foreach_(zf_tailq_head_<T, node> *const h, F f)
  * That way foo.h can be included in both C and C++ source files.
  */
 #ifdef __cplusplus
-	#define zf_slist_head_t(T, node) zf_slist_head_<T, node>
-	#define zf_list_head_t(T, node) zf_list_head_<T, node>
-	#define zf_stailq_head_t(T, node) zf_stailq_head_<T, node>
-	#define zf_tailq_head_t(T, node) zf_tailq_head_<T, node>
+	#define zf_slist_head_t(T, node_field) zf_slist_head_<T, &T::node_field>
+	#define zf_list_head_t(T, node_field) zf_list_head_<T, &T::node_field>
+	#define zf_stailq_head_t(T, node_field) zf_stailq_head_<T, &T::node_field>
+	#define zf_tailq_head_t(T, node_field) zf_tailq_head_<T, &T::node_field>
 #else
-	#define zf_slist_head_t(T, node) zf_slist_head
-	#define zf_list_head_t(T, node) zf_list_head
-	#define zf_stailq_head_t(T, node) zf_stailq_head
-	#define zf_tailq_head_t(T, node) zf_tailq_head
+	#define zf_slist_head_t(T, node_field) zf_slist_head
+	#define zf_list_head_t(T, node_field) zf_list_head
+	#define zf_stailq_head_t(T, node_field) zf_stailq_head
+	#define zf_tailq_head_t(T, node_field) zf_tailq_head
 #endif
 
 #endif // _ZF_QUEUE_H_
