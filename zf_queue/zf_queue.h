@@ -50,6 +50,8 @@
  * _empty                       +       +       +       +
  * _first                       +       +       +       +
  * _last                        -       +       -       +
+ * _begin                                               +
+ * _end                                                 +
  * _next                        +       +       +       +
  * _prev                        -       -       +       +
  * _insert_head                 +       +       +       +
@@ -401,6 +403,19 @@ struct zf_tailq_node *zf_tailq_last(struct zf_tailq_head *const h)
 }
 
 _ZF_QUEUE_DECL
+struct zf_tailq_node *zf_tailq_begin(struct zf_tailq_head *const h)
+{
+	return h->head.next;
+}
+
+_ZF_QUEUE_DECL
+struct zf_tailq_node *zf_tailq_end(struct zf_tailq_head *const h)
+{
+	(void)h;
+	return 0;
+}
+
+_ZF_QUEUE_DECL
 struct zf_tailq_node *zf_tailq_next(struct zf_tailq_node *const n)
 {
 	return n->next;
@@ -573,9 +588,15 @@ T *zf_tailq_last_(zf_tailq_head_<T, node> *const h)
 }
 
 template <typename T, zf_tailq_node T:: *node>
-T *zf_tailq_end_(zf_tailq_head_<T, node> *const)
+T *zf_tailq_begin_(zf_tailq_head_<T, node> *const h)
 {
-	return (T* )((char *)0 - (size_t)&((T *)0->*node));
+	return zf_entry_(zf_tailq_begin(h), node);
+}
+
+template <typename T, zf_tailq_node T:: *node>
+T *zf_tailq_end_(zf_tailq_head_<T, node> *const h)
+{
+	return zf_entry_(zf_tailq_end(h), node);
 }
 
 template <typename T, zf_tailq_node T:: *node>
