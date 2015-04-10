@@ -24,8 +24,8 @@ In short, intrusive lists:
 
 For more details read:
 
-* [Intrusive and non-intrusive containers]: http://www.boost.org/doc/libs/1_57_0/doc/html/intrusive/intrusive_vs_nontrusive.html
-* [Performance comparison]: http://www.boost.org/doc/libs/1_57_0/doc/html/intrusive/performance.html
+* [Intrusive and non-intrusive containers](http://www.boost.org/doc/libs/1_57_0/doc/html/intrusive/intrusive_vs_nontrusive.html)
+* [Performance comparison](http://www.boost.org/doc/libs/1_57_0/doc/html/intrusive/performance.html)
 
 Usage
 --------
