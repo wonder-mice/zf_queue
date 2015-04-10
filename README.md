@@ -1,6 +1,8 @@
 zf_queue
 ========
 
+### Intrusive lists library
+
 This is a blend of classic BSD [sys/queue.h] design with Linux [linux/list.h]
 implementation. BSD implementation has a nice variety of primitives (list,
 slist, tailq, stailq), but it uses macros. Linux implementation less reach and
@@ -11,6 +13,19 @@ also provides binary compatible C++ interface.
 
 [sys/queue.h]: https://svnweb.freebsd.org/base/head/sys/sys/queue.h
 [linux/list.h]: https://github.com/torvalds/linux/blob/master/include/linux/list.h
+
+### Why intrusive?
+
+In short, intrusive lists:
+
+* provide better data locality
+* allow to do less memory allocations
+* therefore have better performance
+
+For more details read:
+
+* [Intrusive and non-intrusive containers]: http://www.boost.org/doc/libs/1_57_0/doc/html/intrusive/intrusive_vs_nontrusive.html
+* [Performance comparison]: http://www.boost.org/doc/libs/1_57_0/doc/html/intrusive/performance.html
 
 Usage
 --------
