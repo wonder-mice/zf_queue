@@ -95,9 +95,9 @@ Examples
 
 Below is a list of examples:
 
-* [slist_args.c](test/example/slist_args.c) - singly-linked list in C
-* [slist_args.cpp](test/example/slist_args.cpp) - singly-linked list in C++
-* [tailq_c_vs_cpp](test/example/tailq_c_vs_cpp.cpp) - tail queue C and C++
+* [slist_args.c](examples/slist_args.c) - singly-linked list in C
+* [slist_args.cpp](examples/slist_args.cpp) - singly-linked list in C++
+* [tailq_c_vs_cpp](examples/tailq_c_vs_cpp.cpp) - tail queue C and C++
   interface comparison
 
 C++ and C interfaces are almost identical, the main difference is that C++
