@@ -10,7 +10,7 @@ struct arg_entry
 
 int main(int argc, char *argv[])
 {
-	zf_slist_head_<arg_entry, &arg_entry::slist_node> args = ZF_LIST_INITIALIZER;
+	zf_slist_head_<arg_entry, &arg_entry::slist_node> args = ZF_SLIST_INITIALIZER();
 	for (int i = 0; argc > i; ++i)
 	{
 		arg_entry *const arg = (arg_entry *)malloc(sizeof(arg_entry));

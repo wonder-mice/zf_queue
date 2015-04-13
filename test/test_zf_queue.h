@@ -8,7 +8,7 @@
  */
 static void test_zf_slist_initializer()
 {
-	zf_slist_head h = ZF_SLIST_INITIALIZER;
+	zf_slist_head h = ZF_SLIST_INITIALIZER();
 	TEST_VERIFY_TRUE(zf_slist_empty(&h));
 	TEST_VERIFY_EQUAL(nullptr, zf_slist_first(&h));
 }
@@ -23,7 +23,7 @@ static void test_zf_slist_init()
 
 static void test_zf_slist_insert_head()
 {
-	zf_slist_head h = ZF_SLIST_INITIALIZER;
+	zf_slist_head h = ZF_SLIST_INITIALIZER();
 	zf_slist_node n0;
 	zf_slist_insert_head(&h, &n0);
 	TEST_VERIFY_FALSE(zf_slist_empty(&h));
@@ -39,7 +39,7 @@ static void test_zf_slist_insert_head()
 
 static void test_zf_slist_insert_after()
 {
-	zf_slist_head h = ZF_SLIST_INITIALIZER;
+	zf_slist_head h = ZF_SLIST_INITIALIZER();
 	zf_slist_node n0;
 	zf_slist_insert_head(&h, &n0);
 	zf_slist_node n1;
@@ -67,7 +67,7 @@ static void test_zf_slist_insert_after()
 
 static void test_zf_slist_remove_head()
 {
-	zf_slist_head h = ZF_SLIST_INITIALIZER;
+	zf_slist_head h = ZF_SLIST_INITIALIZER();
 	zf_slist_node n0;
 	zf_slist_insert_head(&h, &n0);
 	zf_slist_node n1;
@@ -89,7 +89,7 @@ static void test_zf_slist_remove_head()
 
 static void test_zf_slist_remove_after()
 {
-	zf_slist_head h = ZF_SLIST_INITIALIZER;
+	zf_slist_head h = ZF_SLIST_INITIALIZER();
 	zf_slist_node n0;
 	zf_slist_insert_head(&h, &n0);
 	zf_slist_node n1;
@@ -109,12 +109,12 @@ static void test_zf_slist_remove_after()
 
 static void test_zf_slist_swap()
 {
-	zf_slist_head ha = ZF_SLIST_INITIALIZER;
+	zf_slist_head ha = ZF_SLIST_INITIALIZER();
 	zf_slist_node na0;
 	zf_slist_insert_head(&ha, &na0);
 	zf_slist_node na1;
 	zf_slist_insert_head(&ha, &na1);
-	zf_slist_head hb = ZF_SLIST_INITIALIZER;
+	zf_slist_head hb = ZF_SLIST_INITIALIZER();
 	zf_slist_node nb0;
 	zf_slist_insert_head(&hb, &nb0);
 	zf_slist_node nb1;
