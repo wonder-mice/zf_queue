@@ -26,11 +26,11 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/zf_queue-config.cmake
 
 # tests and examples
 enable_testing()
-add_subdirectory(test)
+add_subdirectory(tests)
 add_subdirectory(examples)
 
 # tags
 include(ctags)
 add_ctags_files(zf_queue)
-add_ctags_files(test)
+add_ctags_files(tests)
 add_ctags_files(examples)
