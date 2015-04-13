@@ -1,7 +1,15 @@
 #pragma once
 
+#if defined(__cplusplus)
 #include "zf_test.hpp"
+#else
+#include "zf_test.h"
+#endif
 #include "zf_queue.h"
+
+#if !defined(__cplusplus)
+#define nullptr NULL
+#endif
 
 /*
  * Singly-linked list
@@ -128,12 +136,13 @@ static void test_zf_slist_swap()
 	TEST_VERIFY_EQUAL(&na0, zf_slist_next(&na1));
 }
 
-struct slist_test_entry
+typedef struct slist_test_entry
 {
 	unsigned a[3];
 	zf_slist_node node;
 	unsigned b[5];
-};
+}
+slist_test_entry;
 
 static void test_zf_slist_entry()
 {

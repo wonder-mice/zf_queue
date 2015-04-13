@@ -1,4 +1,4 @@
-#include "test_zf_queue.h"
+#include "zf_queue_tests.h"
 
 int main(int argc, char *argv[])
 {
