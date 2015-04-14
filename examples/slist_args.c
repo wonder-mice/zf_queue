@@ -10,7 +10,7 @@ typedef struct arg_entry
 
 int main(int argc, char *argv[])
 {
-	zf_slist_head args = ZF_LIST_INITIALIZER;
+	zf_slist_head args = ZF_LIST_INITIALIZER();
 	for (int i = 0; argc > i; ++i)
 	{
 		arg_entry_t *const arg = (arg_entry_t *)malloc(sizeof(arg_entry_t));

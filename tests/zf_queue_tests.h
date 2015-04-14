@@ -342,7 +342,7 @@ static void test_zf_stailq(TEST_SUIT_ARGUMENTS)
  */
 static void test_zf_list_initializer()
 {
-	zf_list_head h = ZF_LIST_INITIALIZER;
+	zf_list_head h = ZF_LIST_INITIALIZER();
 	TEST_VERIFY_TRUE(zf_list_empty(&h));
 	TEST_VERIFY_EQUAL(nullptr, zf_list_first(&h));
 }
@@ -357,7 +357,7 @@ static void test_zf_list_init()
 
 static void test_zf_list_insert_head()
 {
-	zf_list_head h = ZF_LIST_INITIALIZER;
+	zf_list_head h = ZF_LIST_INITIALIZER();
 	zf_list_node n0;
 	zf_list_insert_head(&h, &n0);
 	TEST_VERIFY_FALSE(zf_list_empty(&h));
@@ -386,7 +386,7 @@ static void test_zf_list_insert_head()
 
 static void test_zf_list_insert_before()
 {
-	zf_list_head h = ZF_LIST_INITIALIZER;
+	zf_list_head h = ZF_LIST_INITIALIZER();
 	zf_list_node n0;
 	zf_list_insert_head(&h, &n0);
 	zf_list_node n1;
@@ -411,7 +411,7 @@ static void test_zf_list_insert_before()
 
 static void test_zf_list_insert_after()
 {
-	zf_list_head h = ZF_LIST_INITIALIZER;
+	zf_list_head h = ZF_LIST_INITIALIZER();
 	zf_list_node n0;
 	zf_list_insert_head(&h, &n0);
 	zf_list_node n1;
@@ -436,7 +436,7 @@ static void test_zf_list_insert_after()
 
 static void test_zf_list_remove()
 {
-	zf_list_head h = ZF_LIST_INITIALIZER;
+	zf_list_head h = ZF_LIST_INITIALIZER();
 	zf_list_node n0;
 	zf_list_insert_head(&h, &n0);
 	zf_list_node n1;

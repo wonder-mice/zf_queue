@@ -222,33 +222,54 @@ zf_stailq_head;
 
 #define ZF_STAILQ_INITIALIZER(h) {{0}, &(h)->first}
 
+#ifdef __cplusplus
+	_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
+	zf_stailq_head _zf_stailq_initializer(zf_stailq_head *const h)
+		_ZF_QUEUE_NOEXCEPT
+	{
+	#if __cplusplus >= 201103L
+		return ZF_STAILQ_INITIALIZER(h);
+	#else
+		const zf_stailq_head init = ZF_STAILQ_INITIALIZER(h);
+		return init;
+	#endif
+	}
+	#undef ZF_STAILQ_INITIALIZER
+	#define ZF_STAILQ_INITIALIZER(h) _zf_stailq_initializer(h)
+#endif
+
 _ZF_QUEUE_DECL
 void zf_stailq_init(struct zf_stailq_head *const h)
+	_ZF_QUEUE_NOEXCEPT
 {
 	h->first.next = 0;
 	h->last = &h->first;
 }
 
-_ZF_QUEUE_DECL
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
 bool zf_stailq_empty(struct zf_stailq_head *const h)
+	_ZF_QUEUE_NOEXCEPT
 {
 	return 0 == h->first.next;
 }
 
-_ZF_QUEUE_DECL
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
 struct zf_stailq_node *zf_stailq_first(struct zf_stailq_head *const h)
+	_ZF_QUEUE_NOEXCEPT
 {
 	return h->first.next;
 }
 
-_ZF_QUEUE_DECL
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
 struct zf_stailq_node *zf_stailq_last(struct zf_stailq_head *const h)
+	_ZF_QUEUE_NOEXCEPT
 {
 	return 0 == h->first.next? 0: h->last;
 }
 
-_ZF_QUEUE_DECL
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
 struct zf_stailq_node *zf_stailq_next(struct zf_stailq_node *const n)
+	_ZF_QUEUE_NOEXCEPT
 {
 	return n->next;
 }
@@ -256,6 +277,7 @@ struct zf_stailq_node *zf_stailq_next(struct zf_stailq_node *const n)
 _ZF_QUEUE_DECL
 void zf_stailq_insert_head(struct zf_stailq_head *const h,
 						   struct zf_stailq_node *const n)
+	_ZF_QUEUE_NOEXCEPT
 {
 	if (0 == (n->next = h->first.next))
 	{
@@ -267,6 +289,7 @@ void zf_stailq_insert_head(struct zf_stailq_head *const h,
 _ZF_QUEUE_DECL
 void zf_stailq_insert_tail(struct zf_stailq_head *const h,
 						   struct zf_stailq_node *const n)
+	_ZF_QUEUE_NOEXCEPT
 {
 	n->next = 0;
 	h->last->next = n;
@@ -277,6 +300,7 @@ _ZF_QUEUE_DECL
 void zf_stailq_insert_after(struct zf_stailq_head *const h,
 							struct zf_stailq_node *const p,
 							struct zf_stailq_node *const n)
+	_ZF_QUEUE_NOEXCEPT
 {
 	if (0 == (n->next = p->next))
 	{
@@ -287,6 +311,7 @@ void zf_stailq_insert_after(struct zf_stailq_head *const h,
 
 _ZF_QUEUE_DECL
 void zf_stailq_remove_head(struct zf_stailq_head *const h)
+	_ZF_QUEUE_NOEXCEPT
 {
 	if (0 == (h->first.next = h->first.next->next))
 	{
@@ -297,6 +322,7 @@ void zf_stailq_remove_head(struct zf_stailq_head *const h)
 _ZF_QUEUE_DECL
 void zf_stailq_remove_after(struct zf_stailq_head *const h,
 							struct zf_stailq_node *const n)
+	_ZF_QUEUE_NOEXCEPT
 {
 	if (0 == (n->next = n->next->next))
 	{
@@ -320,36 +346,57 @@ typedef struct zf_list_head
 }
 zf_list_head;
 
-#define ZF_LIST_INITIALIZER {0}
+#define ZF_LIST_INITIALIZER() {0}
+
+#ifdef __cplusplus
+	_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
+	zf_list_head _zf_list_initializer()
+		_ZF_QUEUE_NOEXCEPT
+	{
+	#if __cplusplus >= 201103L
+		return ZF_LIST_INITIALIZER();
+	#else
+		const zf_list_head init = ZF_LIST_INITIALIZER();
+		return init;
+	#endif
+	}
+	#undef ZF_LIST_INITIALIZER
+	#define ZF_LIST_INITIALIZER() _zf_list_initializer()
+#endif
 
 _ZF_QUEUE_DECL
 void zf_list_init(struct zf_list_head *const h)
+	_ZF_QUEUE_NOEXCEPT
 {
 	h->first = 0;
 }
 
-_ZF_QUEUE_DECL
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
 bool zf_list_empty(struct zf_list_head *const h)
+	_ZF_QUEUE_NOEXCEPT
 {
 	return 0 == h->first;
 }
 
-_ZF_QUEUE_DECL
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
 struct zf_list_node *zf_list_first(struct zf_list_head *const h)
+	_ZF_QUEUE_NOEXCEPT
 {
 	return h->first;
 }
 
-_ZF_QUEUE_DECL
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
 struct zf_list_node *zf_list_prev(struct zf_list_head *const h,
 								  struct zf_list_node *const n)
+	_ZF_QUEUE_NOEXCEPT
 {
 	return n->pprev == &h->first? 0: (zf_list_node *)
 			((char *)n->pprev - offsetof(zf_list_node, next));
 }
 
-_ZF_QUEUE_DECL
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
 struct zf_list_node *zf_list_next(struct zf_list_node *const n)
+	_ZF_QUEUE_NOEXCEPT
 {
 	return n->next;
 }
@@ -357,6 +404,7 @@ struct zf_list_node *zf_list_next(struct zf_list_node *const n)
 _ZF_QUEUE_DECL
 void zf_list_insert_head(struct zf_list_head *const h,
 						 struct zf_list_node *const n)
+	_ZF_QUEUE_NOEXCEPT
 {
 	if (0 != (n->next = h->first))
 	{
@@ -369,6 +417,7 @@ void zf_list_insert_head(struct zf_list_head *const h,
 _ZF_QUEUE_DECL
 void zf_list_insert_before(struct zf_list_node *const p,
 						   struct zf_list_node *const n)
+	_ZF_QUEUE_NOEXCEPT
 {
 	n->pprev = p->pprev;
 	n->next = p;
@@ -379,6 +428,7 @@ void zf_list_insert_before(struct zf_list_node *const p,
 _ZF_QUEUE_DECL
 void zf_list_insert_after(struct zf_list_node *const p,
 						  struct zf_list_node *const n)
+	_ZF_QUEUE_NOEXCEPT
 {
 	if (0 != (n->next = p->next))
 	{
@@ -390,6 +440,7 @@ void zf_list_insert_after(struct zf_list_node *const p,
 
 _ZF_QUEUE_DECL
 void zf_list_remove(struct zf_list_node *const n)
+	_ZF_QUEUE_NOEXCEPT
 {
 	if (0 != n->next)
 	{
@@ -440,45 +491,51 @@ void zf_tailq_init(struct zf_tailq_head *const h)
 	h->head.prev = &h->head;
 }
 
-_ZF_QUEUE_DECL
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
 bool zf_tailq_empty(struct zf_tailq_head *const h)
+	_ZF_QUEUE_NOEXCEPT
 {
 	return 0 == h->head.next;
 }
 
-_ZF_QUEUE_DECL
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
 struct zf_tailq_node *zf_tailq_first(struct zf_tailq_head *const h)
+	_ZF_QUEUE_NOEXCEPT
 {
 	return h->head.next;
 }
 
-_ZF_QUEUE_DECL
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
 struct zf_tailq_node *zf_tailq_last(struct zf_tailq_head *const h)
+	_ZF_QUEUE_NOEXCEPT
 {
 	return h->head.prev->prev->next;
 }
 
-_ZF_QUEUE_DECL
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
 struct zf_tailq_node *zf_tailq_begin(struct zf_tailq_head *const h)
+	_ZF_QUEUE_NOEXCEPT
 {
 	return h->head.next;
 }
 
-_ZF_QUEUE_DECL
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
 struct zf_tailq_node *zf_tailq_end(struct zf_tailq_head *const h)
+	_ZF_QUEUE_NOEXCEPT
 {
-	(void)h;
-	return 0;
+	return (void)h, (zf_tailq_node *)0;
 }
 
-_ZF_QUEUE_DECL
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
 struct zf_tailq_node *zf_tailq_next(struct zf_tailq_node *const n)
+	_ZF_QUEUE_NOEXCEPT
 {
 	return n->next;
 }
 
-_ZF_QUEUE_DECL
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
 struct zf_tailq_node *zf_tailq_prev(struct zf_tailq_node *const n)
+	_ZF_QUEUE_NOEXCEPT
 {
 	return n->prev->prev->next;
 }
@@ -486,6 +543,7 @@ struct zf_tailq_node *zf_tailq_prev(struct zf_tailq_node *const n)
 _ZF_QUEUE_DECL
 void zf_tailq_insert_head(struct zf_tailq_head *const h,
 						  struct zf_tailq_node *const n)
+	_ZF_QUEUE_NOEXCEPT
 {
 	if (0 != (n->next = h->head.next))
 	{
@@ -502,6 +560,7 @@ void zf_tailq_insert_head(struct zf_tailq_head *const h,
 _ZF_QUEUE_DECL
 void zf_tailq_insert_tail(struct zf_tailq_head *const h,
 						  struct zf_tailq_node *const n)
+	_ZF_QUEUE_NOEXCEPT
 {
 	n->next = 0;
 	n->prev = h->head.prev;
@@ -512,6 +571,7 @@ void zf_tailq_insert_tail(struct zf_tailq_head *const h,
 _ZF_QUEUE_DECL
 void zf_tailq_insert_before(struct zf_tailq_node *const p,
 							struct zf_tailq_node *const n)
+	_ZF_QUEUE_NOEXCEPT
 {
 	n->next = p;
 	n->prev = p->prev;
@@ -523,6 +583,7 @@ _ZF_QUEUE_DECL
 void zf_tailq_insert_after(struct zf_tailq_head *const h,
 						   struct zf_tailq_node *const p,
 						   struct zf_tailq_node *const n)
+	_ZF_QUEUE_NOEXCEPT
 {
 	if (0 != (n->next = p->next))
 	{
@@ -539,6 +600,7 @@ void zf_tailq_insert_after(struct zf_tailq_head *const h,
 _ZF_QUEUE_DECL
 void zf_tailq_remove(struct zf_tailq_head *const h,
 					 struct zf_tailq_node *const n)
+	_ZF_QUEUE_NOEXCEPT
 {
 	if (0 != n->next)
 	{
@@ -561,7 +623,9 @@ void zf_tailq_remove(struct zf_tailq_head *const h,
 #ifdef __cplusplus
 
 template <typename Entry, typename Node>
+_ZF_QUEUE_CONSTEXPR
 Entry *zf_entry_(Node *const node, Node Entry::* field)
+	_ZF_QUEUE_NOEXCEPT
 {
 	return (Entry* )((char *)node - (size_t)&((Entry *)0->*field));
 }
@@ -573,7 +637,7 @@ template <typename T, zf_list_node T:: *node>
 struct zf_list_head_: zf_list_head
 {
 	zf_list_head_() {}
-	zf_list_head_(const zf_list_head &h): zf_list_head(h) {}
+	zf_list_head_(const zf_list_head &h) _ZF_QUEUE_NOEXCEPT: zf_list_head(h) {}
 };
 
 template <typename T, zf_list_node T:: *node>
@@ -595,7 +659,7 @@ template <typename T, zf_slist_node T:: *node>
 struct zf_slist_head_: zf_slist_head
 {
 	zf_slist_head_() {}
-	zf_slist_head_(const zf_slist_head &h) { first = h.first; }
+	zf_slist_head_(const zf_slist_head &h) _ZF_QUEUE_NOEXCEPT: zf_slist_head(h) {}
 };
 
 template <typename T, zf_slist_node T:: *node>
@@ -622,7 +686,7 @@ void zf_slist_insert_head_(zf_slist_head_<T, node> *const h, T *const e)
 template <typename T, zf_tailq_node T:: *node>
 struct zf_tailq_head_: zf_tailq_head {
 	zf_tailq_head_() {}
-	zf_tailq_head_(const zf_tailq_head &h): zf_tailq_head(h) {}
+	zf_tailq_head_(const zf_tailq_head &h) _ZF_QUEUE_NOEXCEPT: zf_tailq_head(h) {}
 };
 
 template <typename T, zf_tailq_node T:: *node>
