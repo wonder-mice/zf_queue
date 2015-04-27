@@ -50,8 +50,8 @@
  * _empty                       +       +       +       +
  * _first                       +       +       +       +
  * _last                        -       +       -       +
- * _begin                                               +
- * _end                                                 +
+ * _begin                       +                       +
+ * _end                         +                       +
  * _next                        +       +       +       +
  * _prev                        -       -       +       +
  * _insert_head                 +       +       +       +
@@ -75,8 +75,22 @@
  * _FOREACH_REVERSE_SAFE	-	-	-	+
  * _FOREACH_REVERSE_FROM_SAFE	-	-	-	+
  *
- * "Node" is a field inside "entry" that allows to use "entry" as a list item.
+ * "Node" is a field inside "entry". "Node" allows "entry" to be a list item.
  * "Entry" has one or more "nodes" as fields and can be used as a list item.
+ *   struct Entry
+ *   {
+ *       Node node;
+ *   };
+ *
+ *   List EntryList;
+ *
+ * Functions zf_xxx_first() and zf_xxx_last() only work for non-empty lists.
+ * Behaviour of those functions is undefined for empty lists.
+ *
+ * Functions zf_xxx_begin() and zf_xxx_end() could be used for empty lists.
+ * For empty list h: zf_xxx_begin(h) == zf_xxx_end(h).
+ * For last node n of list h: zf_xxx_next(n) == zf_xxx_end(h).
+ * The same is true for C++ extensions zf_xxx_yyy_().
  */
 
 #include <stddef.h>
@@ -153,6 +167,20 @@ struct zf_slist_node *zf_slist_first(struct zf_slist_head *const h)
 	_ZF_QUEUE_NOEXCEPT
 {
 	return h->first;
+}
+
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
+struct zf_slist_node *zf_slist_begin(struct zf_slist_head *const h)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return h->first;
+}
+
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
+struct zf_slist_node *zf_slist_end(struct zf_slist_head *const h)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return (void)h, (zf_slist_node *)0;
 }
 
 _ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
@@ -631,6 +659,69 @@ Entry *zf_entry_(Node *const node, Node Entry::* field)
 }
 
 /*
+ * Singly-linked list C++ support
+ */
+template <typename T, zf_slist_node T:: *node>
+struct zf_slist_head_: zf_slist_head
+{
+	zf_slist_head_() {}
+	zf_slist_head_(const zf_slist_head &h) _ZF_QUEUE_NOEXCEPT: zf_slist_head(h) {}
+};
+
+template <typename T, zf_slist_node T:: *node>
+_ZF_QUEUE_CONSTEXPR
+T *zf_slist_first_(zf_slist_head_<T, node> *const h)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return zf_entry_(zf_slist_first(h), node);
+}
+
+template <typename T, zf_slist_node T:: *node>
+_ZF_QUEUE_CONSTEXPR
+T *zf_slist_begin_(zf_slist_head_<T, node> *const h)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return zf_entry_(zf_slist_begin(h), node);
+}
+
+template <typename T, zf_slist_node T:: *node>
+_ZF_QUEUE_CONSTEXPR
+T *zf_slist_end_(zf_slist_head_<T, node> *const h)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return zf_entry_(zf_slist_end(h), node);
+}
+
+template <typename T, zf_slist_node T:: *node>
+T *zf_slist_next_(const zf_slist_head_<T, node> *const, T *const e)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return zf_entry_(zf_slist_next(&(e->*node)), node);
+}
+
+template <typename T, zf_slist_node T:: *node>
+void zf_slist_insert_head_(zf_slist_head_<T, node> *const h, T *const e)
+	_ZF_QUEUE_NOEXCEPT
+{
+	zf_slist_insert_head(h, &(e->*node));
+}
+
+template <typename T, zf_slist_node T:: *node>
+void zf_slist_insert_after_(zf_slist_head_<T, node> *const,
+							T *const b, T *const a)
+	_ZF_QUEUE_NOEXCEPT
+{
+	zf_slist_insert_after(&(b->*node), &(a->*node));
+}
+
+template <typename T, zf_slist_node T:: *node>
+void zf_slist_remove_after_(zf_slist_head_<T, node> *const, T *const e)
+	_ZF_QUEUE_NOEXCEPT
+{
+	zf_slist_remove_after(&(e->*node));
+}
+
+/*
  * List C++ support
  */
 template <typename T, zf_list_node T:: *node>
@@ -650,34 +741,6 @@ template <typename T, zf_list_node T:: *node>
 void zf_list_insert_head_(zf_list_head_<T, node> *const h, T *const e)
 {
 	zf_list_insert_head(h,  &(e->*node));
-}
-
-/*
- * Singly-linked list C++ support
- */
-template <typename T, zf_slist_node T:: *node>
-struct zf_slist_head_: zf_slist_head
-{
-	zf_slist_head_() {}
-	zf_slist_head_(const zf_slist_head &h) _ZF_QUEUE_NOEXCEPT: zf_slist_head(h) {}
-};
-
-template <typename T, zf_slist_node T:: *node>
-T *zf_slist_first_(zf_slist_head_<T, node> *const h)
-{
-	return zf_entry_(zf_slist_first(h), node);
-}
-
-template <typename T, zf_slist_node T:: *node>
-T *zf_slist_next_(const zf_slist_head_<T, node> *const, T *const e)
-{
-	return zf_entry_(zf_slist_next(&(e->*node)), node);
-}
-
-template <typename T, zf_slist_node T:: *node>
-void zf_slist_insert_head_(zf_slist_head_<T, node> *const h, T *const e)
-{
-	zf_slist_insert_head(h, &(e->*node));
 }
 
 /*
