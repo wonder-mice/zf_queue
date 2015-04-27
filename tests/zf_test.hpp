@@ -58,6 +58,11 @@ namespace zf_test
 		return to_hex(v);
 	}
 
+	extern inline std::string to_string(const bool v)
+	{
+		return v? "true": "false";
+	}
+
 	extern inline std::string to_string(const std::string &v)
 	{
 		return v;
@@ -272,7 +277,7 @@ namespace zf_test
 	TEST_VERIFY_RELATION(a, b, zf_test::not_equal_to(), "should not, but equal")
 #define TEST_VERIFY_IN_EPSILON(a, b, eps) \
 	TEST_VERIFY_RELATION(a, b, zf_test::in_epsilon(eps), "should, but not in epsilon neighborhood")
-/*
+/*FIXME: Need to define zf_test::xxx_condition() for this too.
 #define TEST_VERIFY_LESS_OR_EQUAL(a, b) \
 	TEST_VERIFY_RELATION(a, b, std::less_equal<void>(), "not less or equal (<=)")
 #define TEST_VERIFY_LESS(a, b) \
