@@ -281,6 +281,149 @@ static void test_zf_slist(TEST_SUIT_ARGUMENTS)
 }
 
 /*
+ * List
+ */
+static void test_zf_list_initializer()
+{
+	zf_list_head h = ZF_LIST_INITIALIZER();
+	TEST_VERIFY_TRUE(zf_list_empty(&h));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_first(&h));
+}
+
+static void test_zf_list_init()
+{
+	zf_list_head h;
+	zf_list_init(&h);
+	TEST_VERIFY_TRUE(zf_list_empty(&h));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_first(&h));
+}
+
+static void test_zf_list_insert_head()
+{
+	zf_list_head h = ZF_LIST_INITIALIZER();
+	zf_list_node n0;
+	zf_list_insert_head(&h, &n0);
+	TEST_VERIFY_FALSE(zf_list_empty(&h));
+	TEST_VERIFY_EQUAL(&n0, zf_list_first(&h));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_next(&n0));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_prev(&h, &n0));
+	zf_list_node n1;
+	zf_list_insert_head(&h, &n1);
+	TEST_VERIFY_FALSE(zf_list_empty(&h));
+	TEST_VERIFY_EQUAL(&n1, zf_list_first(&h));
+	TEST_VERIFY_EQUAL(&n0, zf_list_next(&n1));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_prev(&h, &n1));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_next(&n0));
+	TEST_VERIFY_EQUAL(&n1, zf_list_prev(&h, &n0));
+	zf_list_node n2;
+	zf_list_insert_head(&h, &n2);
+	TEST_VERIFY_FALSE(zf_list_empty(&h));
+	TEST_VERIFY_EQUAL(&n2, zf_list_first(&h));
+	TEST_VERIFY_EQUAL(&n1, zf_list_next(&n2));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_prev(&h, &n2));
+	TEST_VERIFY_EQUAL(&n0, zf_list_next(&n1));
+	TEST_VERIFY_EQUAL(&n2, zf_list_prev(&h, &n1));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_next(&n0));
+	TEST_VERIFY_EQUAL(&n1, zf_list_prev(&h, &n0));
+}
+
+static void test_zf_list_insert_before()
+{
+	zf_list_head h = ZF_LIST_INITIALIZER();
+	zf_list_node n0;
+	zf_list_insert_head(&h, &n0);
+	zf_list_node n1;
+	zf_list_insert_before(&n0, &n1);
+	TEST_VERIFY_FALSE(zf_list_empty(&h));
+	TEST_VERIFY_EQUAL(&n1, zf_list_first(&h));
+	TEST_VERIFY_EQUAL(&n0, zf_list_next(&n1));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_prev(&h, &n1));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_next(&n0));
+	TEST_VERIFY_EQUAL(&n1, zf_list_prev(&h, &n0));
+	zf_list_node n2;
+	zf_list_insert_before(&n0, &n2);
+	TEST_VERIFY_FALSE(zf_list_empty(&h));
+	TEST_VERIFY_EQUAL(&n1, zf_list_first(&h));
+	TEST_VERIFY_EQUAL(&n2, zf_list_next(&n1));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_prev(&h, &n1));
+	TEST_VERIFY_EQUAL(&n0, zf_list_next(&n2));
+	TEST_VERIFY_EQUAL(&n1, zf_list_prev(&h, &n2));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_next(&n0));
+	TEST_VERIFY_EQUAL(&n2, zf_list_prev(&h, &n0));
+}
+
+static void test_zf_list_insert_after()
+{
+	zf_list_head h = ZF_LIST_INITIALIZER();
+	zf_list_node n0;
+	zf_list_insert_head(&h, &n0);
+	zf_list_node n1;
+	zf_list_insert_after(&n0, &n1);
+	TEST_VERIFY_FALSE(zf_list_empty(&h));
+	TEST_VERIFY_EQUAL(&n0, zf_list_first(&h));
+	TEST_VERIFY_EQUAL(&n1, zf_list_next(&n0));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_prev(&h, &n0));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_next(&n1));
+	TEST_VERIFY_EQUAL(&n0, zf_list_prev(&h, &n1));
+	zf_list_node n2;
+	zf_list_insert_after(&n0, &n2);
+	TEST_VERIFY_FALSE(zf_list_empty(&h));
+	TEST_VERIFY_EQUAL(&n0, zf_list_first(&h));
+	TEST_VERIFY_EQUAL(&n2, zf_list_next(&n0));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_prev(&h, &n0));
+	TEST_VERIFY_EQUAL(&n1, zf_list_next(&n2));
+	TEST_VERIFY_EQUAL(&n0, zf_list_prev(&h, &n2));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_next(&n1));
+	TEST_VERIFY_EQUAL(&n2, zf_list_prev(&h, &n1));
+}
+
+static void test_zf_list_remove()
+{
+	zf_list_head h = ZF_LIST_INITIALIZER();
+	zf_list_node n0;
+	zf_list_insert_head(&h, &n0);
+	zf_list_node n1;
+	zf_list_insert_after(&n0, &n1);
+	zf_list_node n2;
+	zf_list_insert_after(&n1, &n2);
+	zf_list_node n3;
+	zf_list_insert_after(&n2, &n3);
+	zf_list_remove(&n0);
+	TEST_VERIFY_FALSE(zf_list_empty(&h));
+	TEST_VERIFY_EQUAL(&n1, zf_list_first(&h));
+	TEST_VERIFY_EQUAL(&n2, zf_list_next(&n1));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_prev(&h, &n1));
+	TEST_VERIFY_EQUAL(&n3, zf_list_next(&n2));
+	TEST_VERIFY_EQUAL(&n1, zf_list_prev(&h, &n2));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_next(&n3));
+	TEST_VERIFY_EQUAL(&n2, zf_list_prev(&h, &n3));
+	zf_list_remove(&n3);
+	TEST_VERIFY_FALSE(zf_list_empty(&h));
+	TEST_VERIFY_EQUAL(&n1, zf_list_first(&h));
+	TEST_VERIFY_EQUAL(&n2, zf_list_next(&n1));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_prev(&h, &n1));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_next(&n2));
+	TEST_VERIFY_EQUAL(&n1, zf_list_prev(&h, &n2));
+	zf_list_remove(&n2);
+	TEST_VERIFY_FALSE(zf_list_empty(&h));
+	TEST_VERIFY_EQUAL(&n1, zf_list_first(&h));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_next(&n1));
+	TEST_VERIFY_EQUAL(nullptr, zf_list_prev(&h, &n1));
+	zf_list_remove(&n1);
+	TEST_VERIFY_TRUE(zf_list_empty(&h));
+}
+
+static void test_zf_list(TEST_SUIT_ARGUMENTS)
+{
+	TEST_EXECUTE(test_zf_list_initializer());
+	TEST_EXECUTE(test_zf_list_init());
+	TEST_EXECUTE(test_zf_list_insert_head());
+	TEST_EXECUTE(test_zf_list_insert_before());
+	TEST_EXECUTE(test_zf_list_insert_after());
+	TEST_EXECUTE(test_zf_list_remove());
+}
+
+/*
  * Singly-linked tail queue
  */
 static void test_zf_stailq_initializer()
@@ -449,149 +592,6 @@ static void test_zf_stailq(TEST_SUIT_ARGUMENTS)
 	TEST_EXECUTE(test_zf_stailq_insert_after());
 	TEST_EXECUTE(test_zf_stailq_remove_head());
 	TEST_EXECUTE(test_zf_stailq_remove_after());
-}
-
-/*
- * List
- */
-static void test_zf_list_initializer()
-{
-	zf_list_head h = ZF_LIST_INITIALIZER();
-	TEST_VERIFY_TRUE(zf_list_empty(&h));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_first(&h));
-}
-
-static void test_zf_list_init()
-{
-	zf_list_head h;
-	zf_list_init(&h);
-	TEST_VERIFY_TRUE(zf_list_empty(&h));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_first(&h));
-}
-
-static void test_zf_list_insert_head()
-{
-	zf_list_head h = ZF_LIST_INITIALIZER();
-	zf_list_node n0;
-	zf_list_insert_head(&h, &n0);
-	TEST_VERIFY_FALSE(zf_list_empty(&h));
-	TEST_VERIFY_EQUAL(&n0, zf_list_first(&h));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_next(&n0));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_prev(&h, &n0));
-	zf_list_node n1;
-	zf_list_insert_head(&h, &n1);
-	TEST_VERIFY_FALSE(zf_list_empty(&h));
-	TEST_VERIFY_EQUAL(&n1, zf_list_first(&h));
-	TEST_VERIFY_EQUAL(&n0, zf_list_next(&n1));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_prev(&h, &n1));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_next(&n0));
-	TEST_VERIFY_EQUAL(&n1, zf_list_prev(&h, &n0));
-	zf_list_node n2;
-	zf_list_insert_head(&h, &n2);
-	TEST_VERIFY_FALSE(zf_list_empty(&h));
-	TEST_VERIFY_EQUAL(&n2, zf_list_first(&h));
-	TEST_VERIFY_EQUAL(&n1, zf_list_next(&n2));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_prev(&h, &n2));
-	TEST_VERIFY_EQUAL(&n0, zf_list_next(&n1));
-	TEST_VERIFY_EQUAL(&n2, zf_list_prev(&h, &n1));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_next(&n0));
-	TEST_VERIFY_EQUAL(&n1, zf_list_prev(&h, &n0));
-}
-
-static void test_zf_list_insert_before()
-{
-	zf_list_head h = ZF_LIST_INITIALIZER();
-	zf_list_node n0;
-	zf_list_insert_head(&h, &n0);
-	zf_list_node n1;
-	zf_list_insert_before(&n0, &n1);
-	TEST_VERIFY_FALSE(zf_list_empty(&h));
-	TEST_VERIFY_EQUAL(&n1, zf_list_first(&h));
-	TEST_VERIFY_EQUAL(&n0, zf_list_next(&n1));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_prev(&h, &n1));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_next(&n0));
-	TEST_VERIFY_EQUAL(&n1, zf_list_prev(&h, &n0));
-	zf_list_node n2;
-	zf_list_insert_before(&n0, &n2);
-	TEST_VERIFY_FALSE(zf_list_empty(&h));
-	TEST_VERIFY_EQUAL(&n1, zf_list_first(&h));
-	TEST_VERIFY_EQUAL(&n2, zf_list_next(&n1));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_prev(&h, &n1));
-	TEST_VERIFY_EQUAL(&n0, zf_list_next(&n2));
-	TEST_VERIFY_EQUAL(&n1, zf_list_prev(&h, &n2));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_next(&n0));
-	TEST_VERIFY_EQUAL(&n2, zf_list_prev(&h, &n0));
-}
-
-static void test_zf_list_insert_after()
-{
-	zf_list_head h = ZF_LIST_INITIALIZER();
-	zf_list_node n0;
-	zf_list_insert_head(&h, &n0);
-	zf_list_node n1;
-	zf_list_insert_after(&n0, &n1);
-	TEST_VERIFY_FALSE(zf_list_empty(&h));
-	TEST_VERIFY_EQUAL(&n0, zf_list_first(&h));
-	TEST_VERIFY_EQUAL(&n1, zf_list_next(&n0));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_prev(&h, &n0));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_next(&n1));
-	TEST_VERIFY_EQUAL(&n0, zf_list_prev(&h, &n1));
-	zf_list_node n2;
-	zf_list_insert_after(&n0, &n2);
-	TEST_VERIFY_FALSE(zf_list_empty(&h));
-	TEST_VERIFY_EQUAL(&n0, zf_list_first(&h));
-	TEST_VERIFY_EQUAL(&n2, zf_list_next(&n0));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_prev(&h, &n0));
-	TEST_VERIFY_EQUAL(&n1, zf_list_next(&n2));
-	TEST_VERIFY_EQUAL(&n0, zf_list_prev(&h, &n2));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_next(&n1));
-	TEST_VERIFY_EQUAL(&n2, zf_list_prev(&h, &n1));
-}
-
-static void test_zf_list_remove()
-{
-	zf_list_head h = ZF_LIST_INITIALIZER();
-	zf_list_node n0;
-	zf_list_insert_head(&h, &n0);
-	zf_list_node n1;
-	zf_list_insert_after(&n0, &n1);
-	zf_list_node n2;
-	zf_list_insert_after(&n1, &n2);
-	zf_list_node n3;
-	zf_list_insert_after(&n2, &n3);
-	zf_list_remove(&n0);
-	TEST_VERIFY_FALSE(zf_list_empty(&h));
-	TEST_VERIFY_EQUAL(&n1, zf_list_first(&h));
-	TEST_VERIFY_EQUAL(&n2, zf_list_next(&n1));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_prev(&h, &n1));
-	TEST_VERIFY_EQUAL(&n3, zf_list_next(&n2));
-	TEST_VERIFY_EQUAL(&n1, zf_list_prev(&h, &n2));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_next(&n3));
-	TEST_VERIFY_EQUAL(&n2, zf_list_prev(&h, &n3));
-	zf_list_remove(&n3);
-	TEST_VERIFY_FALSE(zf_list_empty(&h));
-	TEST_VERIFY_EQUAL(&n1, zf_list_first(&h));
-	TEST_VERIFY_EQUAL(&n2, zf_list_next(&n1));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_prev(&h, &n1));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_next(&n2));
-	TEST_VERIFY_EQUAL(&n1, zf_list_prev(&h, &n2));
-	zf_list_remove(&n2);
-	TEST_VERIFY_FALSE(zf_list_empty(&h));
-	TEST_VERIFY_EQUAL(&n1, zf_list_first(&h));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_next(&n1));
-	TEST_VERIFY_EQUAL(nullptr, zf_list_prev(&h, &n1));
-	zf_list_remove(&n1);
-	TEST_VERIFY_TRUE(zf_list_empty(&h));
-}
-
-static void test_zf_list(TEST_SUIT_ARGUMENTS)
-{
-	TEST_EXECUTE(test_zf_list_initializer());
-	TEST_EXECUTE(test_zf_list_init());
-	TEST_EXECUTE(test_zf_list_insert_head());
-	TEST_EXECUTE(test_zf_list_insert_before());
-	TEST_EXECUTE(test_zf_list_insert_after());
-	TEST_EXECUTE(test_zf_list_remove());
 }
 
 /*
@@ -788,7 +788,7 @@ static void test_zf_tailq(TEST_SUIT_ARGUMENTS)
 static void test_zf_queue_h(TEST_SUIT_ARGUMENTS)
 {
 	TEST_EXECUTE_SUITE(test_zf_slist);
-	TEST_EXECUTE_SUITE(test_zf_stailq);
 	TEST_EXECUTE_SUITE(test_zf_list);
+	TEST_EXECUTE_SUITE(test_zf_stailq);
 	TEST_EXECUTE_SUITE(test_zf_tailq);
 }

@@ -17,6 +17,13 @@
  * for applications with large datasets and few or no removals or for
  * implementing a LIFO queue.
  *
+ * A list is headed by a single forward pointer (or an array of forward
+ * pointers for a hash table header). The elements are doubly linked
+ * so that an arbitrary element can be removed without a need to
+ * traverse the list. New elements can be added to the list before
+ * or after an existing element or at the head of the list. A list
+ * may be traversed in either direction.
+ *
  * A singly-linked tail queue is headed by a pair of pointers, one to the
  * head of the list and the other to the tail of the list. The elements are
  * singly linked for minimum space and pointer manipulation overhead at the
@@ -28,13 +35,6 @@
  * Singly-linked tail queues are ideal for applications with large datasets
  * and few or no removals or for implementing a FIFO queue.
  *
- * A list is headed by a single forward pointer (or an array of forward
- * pointers for a hash table header). The elements are doubly linked
- * so that an arbitrary element can be removed without a need to
- * traverse the list. New elements can be added to the list before
- * or after an existing element or at the head of the list. A list
- * may be traversed in either direction.
- *
  * A tail queue is headed by a pair of pointers, one to the head of the
  * list and the other to the tail of the list. The elements are doubly
  * linked so that an arbitrary element can be removed without a need to
@@ -42,38 +42,38 @@
  * after an existing element, at the head of the list, or at the end of
  * the list. A tail queue may be traversed in either direction.
  *
- *                              SLIST	STAILQ  LIST	TAILQ
+ *                              SLIST	LIST	STAILQ	TAILQ
  * _node                        +       +       +       +
  * _head                        +       +       +       +
  * _INITIALIZER                 +       +       +       +
  * _init                        +       +       +       +
  * _empty                       +       +       +       +
  * _first                       +       +       +       +
- * _last                        -       +       -       +
+ * _last                        -       -       +       +
  * _begin                       +                       +
  * _end                         +                       +
  * _next                        +       +       +       +
- * _prev                        -       -       +       +
+ * _prev                        -       +       -       +
  * _insert_head                 +       +       +       +
- * _insert_tail                 -       +       -       +
- * _insert_before               -       -       +       +
+ * _insert_tail                 -       -       +       +
+ * _insert_before               -       +       -       +
  * _insert_after                +       +       +       +
- * _remove                      -       -       +       +
- * _remove_head                 +       +       -       -
- * _remove_after                +       +       -       -
+ * _remove                      -       +       -       +
+ * _remove_head                 +       -       +       -
+ * _remove_after                +       -       +       -
  * _concat                      -
  * _swap                        +
  *
  * _foreach                     -       -       -       +
  * _foreach_from                -       -       -       +
  *
- * _FOREACH_FROM		+	+	+	+
- * _FOREACH_SAFE		+	+	+	+
- * _FOREACH_FROM_SAFE		+	+	+	+
- * _FOREACH_REVERSE		-	-	-	+
- * _FOREACH_REVERSE_FROM	-	-	-	+
- * _FOREACH_REVERSE_SAFE	-	-	-	+
- * _FOREACH_REVERSE_FROM_SAFE	-	-	-	+
+ * _FOREACH_FROM              +	+	+	+
+ * _FOREACH_SAFE              +	+	+	+
+ * _FOREACH_FROM_SAFE         +	+	+	+
+ * _FOREACH_REVERSE           -	-	-	+
+ * _FOREACH_REVERSE_FROM      -	-	-	+
+ * _FOREACH_REVERSE_SAFE      -	-	-	+
+ * _FOREACH_REVERSE_FROM_SAFE -	-	-	+
  *
  * "Node" is a field inside "entry". "Node" allows "entry" to be a list item.
  * "Entry" has one or more "nodes" as fields and can be used as a list item.
@@ -233,6 +233,125 @@ void zf_slist_swap(struct zf_slist_head *const h1,
 }
 
 /*
+ * List
+ */
+typedef struct zf_list_node
+{
+	struct zf_list_node *next;
+	struct zf_list_node **pprev;
+}
+zf_list_node;
+
+typedef struct zf_list_head
+{
+	struct zf_list_node *first;
+}
+zf_list_head;
+
+#define ZF_LIST_INITIALIZER() {0}
+
+#ifdef __cplusplus
+	_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
+	zf_list_head _zf_list_initializer()
+		_ZF_QUEUE_NOEXCEPT
+	{
+	#if __cplusplus >= 201103L
+		return ZF_LIST_INITIALIZER();
+	#else
+		const zf_list_head init = ZF_LIST_INITIALIZER();
+		return init;
+	#endif
+	}
+	#undef ZF_LIST_INITIALIZER
+	#define ZF_LIST_INITIALIZER() _zf_list_initializer()
+#endif
+
+_ZF_QUEUE_DECL
+void zf_list_init(struct zf_list_head *const h)
+	_ZF_QUEUE_NOEXCEPT
+{
+	h->first = 0;
+}
+
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
+bool zf_list_empty(struct zf_list_head *const h)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return 0 == h->first;
+}
+
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
+struct zf_list_node *zf_list_first(struct zf_list_head *const h)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return h->first;
+}
+
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
+struct zf_list_node *zf_list_prev(struct zf_list_head *const h,
+								  struct zf_list_node *const n)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return n->pprev == &h->first? 0: (zf_list_node *)
+			((char *)n->pprev - offsetof(zf_list_node, next));
+}
+
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
+struct zf_list_node *zf_list_next(struct zf_list_node *const n)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return n->next;
+}
+
+_ZF_QUEUE_DECL
+void zf_list_insert_head(struct zf_list_head *const h,
+						 struct zf_list_node *const n)
+	_ZF_QUEUE_NOEXCEPT
+{
+	if (0 != (n->next = h->first))
+	{
+		h->first->pprev = &n->next;
+	}
+	h->first = n;
+	n->pprev = &h->first;
+}
+
+_ZF_QUEUE_DECL
+void zf_list_insert_before(struct zf_list_node *const p,
+						   struct zf_list_node *const n)
+	_ZF_QUEUE_NOEXCEPT
+{
+	n->pprev = p->pprev;
+	n->next = p;
+	*p->pprev = n;
+	p->pprev = &n->next;
+}
+
+_ZF_QUEUE_DECL
+void zf_list_insert_after(struct zf_list_node *const p,
+						  struct zf_list_node *const n)
+	_ZF_QUEUE_NOEXCEPT
+{
+	if (0 != (n->next = p->next))
+	{
+		p->next->pprev = &n->next;
+	}
+	p->next = n;
+	n->pprev = &p->next;
+}
+
+_ZF_QUEUE_DECL
+void zf_list_remove(struct zf_list_node *const n)
+	_ZF_QUEUE_NOEXCEPT
+{
+	if (0 != n->next)
+	{
+		n->next->pprev = n->pprev;
+	}
+	*n->pprev = n->next;
+}
+
+/*
  * Singly-linked tail queue
  */
 typedef struct zf_stailq_node
@@ -356,125 +475,6 @@ void zf_stailq_remove_after(struct zf_stailq_head *const h,
 	{
 		h->last = n;
 	}
-}
-
-/*
- * List
- */
-typedef struct zf_list_node
-{
-	struct zf_list_node *next;
-	struct zf_list_node **pprev;
-}
-zf_list_node;
-
-typedef struct zf_list_head
-{
-	struct zf_list_node *first;
-}
-zf_list_head;
-
-#define ZF_LIST_INITIALIZER() {0}
-
-#ifdef __cplusplus
-	_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
-	zf_list_head _zf_list_initializer()
-		_ZF_QUEUE_NOEXCEPT
-	{
-	#if __cplusplus >= 201103L
-		return ZF_LIST_INITIALIZER();
-	#else
-		const zf_list_head init = ZF_LIST_INITIALIZER();
-		return init;
-	#endif
-	}
-	#undef ZF_LIST_INITIALIZER
-	#define ZF_LIST_INITIALIZER() _zf_list_initializer()
-#endif
-
-_ZF_QUEUE_DECL
-void zf_list_init(struct zf_list_head *const h)
-	_ZF_QUEUE_NOEXCEPT
-{
-	h->first = 0;
-}
-
-_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
-bool zf_list_empty(struct zf_list_head *const h)
-	_ZF_QUEUE_NOEXCEPT
-{
-	return 0 == h->first;
-}
-
-_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
-struct zf_list_node *zf_list_first(struct zf_list_head *const h)
-	_ZF_QUEUE_NOEXCEPT
-{
-	return h->first;
-}
-
-_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
-struct zf_list_node *zf_list_prev(struct zf_list_head *const h,
-								  struct zf_list_node *const n)
-	_ZF_QUEUE_NOEXCEPT
-{
-	return n->pprev == &h->first? 0: (zf_list_node *)
-			((char *)n->pprev - offsetof(zf_list_node, next));
-}
-
-_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
-struct zf_list_node *zf_list_next(struct zf_list_node *const n)
-	_ZF_QUEUE_NOEXCEPT
-{
-	return n->next;
-}
-
-_ZF_QUEUE_DECL
-void zf_list_insert_head(struct zf_list_head *const h,
-						 struct zf_list_node *const n)
-	_ZF_QUEUE_NOEXCEPT
-{
-	if (0 != (n->next = h->first))
-	{
-		h->first->pprev = &n->next;
-	}
-	h->first = n;
-	n->pprev = &h->first;
-}
-
-_ZF_QUEUE_DECL
-void zf_list_insert_before(struct zf_list_node *const p,
-						   struct zf_list_node *const n)
-	_ZF_QUEUE_NOEXCEPT
-{
-	n->pprev = p->pprev;
-	n->next = p;
-	*p->pprev = n;
-	p->pprev = &n->next;
-}
-
-_ZF_QUEUE_DECL
-void zf_list_insert_after(struct zf_list_node *const p,
-						  struct zf_list_node *const n)
-	_ZF_QUEUE_NOEXCEPT
-{
-	if (0 != (n->next = p->next))
-	{
-		p->next->pprev = &n->next;
-	}
-	p->next = n;
-	n->pprev = &p->next;
-}
-
-_ZF_QUEUE_DECL
-void zf_list_remove(struct zf_list_node *const n)
-	_ZF_QUEUE_NOEXCEPT
-{
-	if (0 != n->next)
-	{
-		n->next->pprev = n->pprev;
-	}
-	*n->pprev = n->next;
 }
 
 /*
