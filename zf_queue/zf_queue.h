@@ -114,6 +114,13 @@
  * For first node n of list h:
  *   zf_xxx_prev(n) == zf_xxx_rend(h)
  * The same is true for C++ extensions zf_xxx_yyy_().
+ *
+ * Parameter names:
+ *   h - list Head
+ *   n - some node
+ *   e - some entry
+ *   a - node or entry that goes after
+ *   b - node or entry that goes before
  */
 
 #include <stddef.h>
@@ -222,6 +229,7 @@ void zf_slist_insert_head(struct zf_slist_head *const h,
 	h->first = n;
 }
 
+/* insert a after b */
 _ZF_QUEUE_DECL
 void zf_slist_insert_after(struct zf_slist_node *const b,
 						   struct zf_slist_node *const a)
@@ -360,28 +368,30 @@ void zf_list_insert_head(struct zf_list_head *const h,
 	n->pprev = &h->first;
 }
 
+/* insert b before a */
 _ZF_QUEUE_DECL
-void zf_list_insert_before(struct zf_list_node *const p,
-						   struct zf_list_node *const n)
+void zf_list_insert_before(struct zf_list_node *const a,
+						   struct zf_list_node *const b)
 	_ZF_QUEUE_NOEXCEPT
 {
-	n->pprev = p->pprev;
-	n->next = p;
-	*p->pprev = n;
-	p->pprev = &n->next;
+	b->pprev = a->pprev;
+	b->next = a;
+	*a->pprev = b;
+	a->pprev = &b->next;
 }
 
+/* insert a after b */
 _ZF_QUEUE_DECL
-void zf_list_insert_after(struct zf_list_node *const p,
-						  struct zf_list_node *const n)
+void zf_list_insert_after(struct zf_list_node *const b,
+						  struct zf_list_node *const a)
 	_ZF_QUEUE_NOEXCEPT
 {
-	if (0 != (n->next = p->next))
+	if (0 != (a->next = b->next))
 	{
-		p->next->pprev = &n->next;
+		b->next->pprev = &a->next;
 	}
-	p->next = n;
-	n->pprev = &p->next;
+	b->next = a;
+	a->pprev = &b->next;
 }
 
 _ZF_QUEUE_DECL
@@ -750,6 +760,7 @@ void zf_slist_insert_head_(zf_slist_head_<T, node> *const h, T *const e)
 	zf_slist_insert_head(h, &(e->*node));
 }
 
+/* insert a after b */
 template <typename T, zf_slist_node T:: *node>
 void zf_slist_insert_after_(zf_slist_head_<T, node> *const,
 							T *const b, T *const a)
@@ -828,6 +839,31 @@ void zf_list_insert_head_(zf_list_head_<T, node> *const h, T *const e)
 	_ZF_QUEUE_NOEXCEPT
 {
 	zf_list_insert_head(h,  &(e->*node));
+}
+
+/* insert b before a */
+template <typename T, zf_list_node T:: *node>
+void zf_list_insert_before_(const zf_list_head_<T, node> *const,
+							T *const a, T *const b)
+	_ZF_QUEUE_NOEXCEPT
+{
+	zf_list_insert_before(&(a->*node), &(b->*node));
+}
+
+/* insert a after b */
+template <typename T, zf_list_node T:: *node>
+void zf_list_insert_after_(const zf_list_head_<T, node> *const,
+						   T *const b, T *const a)
+	_ZF_QUEUE_NOEXCEPT
+{
+	zf_list_insert_after(&(b->*node), &(a->*node));
+}
+
+template <typename T, zf_list_node T:: *node>
+void zf_list_remove_(const zf_list_head_<T, node> *const, T *const e)
+	_ZF_QUEUE_NOEXCEPT
+{
+	zf_list_remove(&(e->*node));
 }
 
 /*
