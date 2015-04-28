@@ -362,6 +362,36 @@ static void test_zf_list_insert_head()
 	TEST_VERIFY_EQUAL(&n2, zf_list_prev(&h, &n1));
 	TEST_VERIFY_EQUAL(zf_list_end(&h), zf_list_next(&n0));
 	TEST_VERIFY_EQUAL(&n1, zf_list_prev(&h, &n0));
+#ifdef __cplusplus
+	list_test_head_ hpp = ZF_LIST_INITIALIZER();
+	list_test_entry e0;
+	zf_list_insert_head_(&hpp, &e0);
+	TEST_VERIFY_FALSE(zf_list_empty(&hpp));
+	TEST_VERIFY_NOT_EQUAL(zf_list_end_(&hpp), zf_list_begin_(&hpp));
+	TEST_VERIFY_EQUAL(&e0, zf_list_first_(&hpp));
+	TEST_VERIFY_EQUAL(zf_list_end_(&hpp), zf_list_next_(&hpp, &e0));
+	TEST_VERIFY_EQUAL(zf_list_rend_(&hpp), zf_list_prev_(&hpp, &e0));
+	list_test_entry e1;
+	zf_list_insert_head_(&hpp, &e1);
+	TEST_VERIFY_FALSE(zf_list_empty(&hpp));
+	TEST_VERIFY_NOT_EQUAL(zf_list_end_(&hpp), zf_list_begin_(&hpp));
+	TEST_VERIFY_EQUAL(&e1, zf_list_first_(&hpp));
+	TEST_VERIFY_EQUAL(&e0, zf_list_next_(&hpp, &e1));
+	TEST_VERIFY_EQUAL(zf_list_rend_(&hpp), zf_list_prev_(&hpp, &e1));
+	TEST_VERIFY_EQUAL(zf_list_end_(&hpp), zf_list_next_(&hpp, &e0));
+	TEST_VERIFY_EQUAL(&e1, zf_list_prev_(&hpp, &e0));
+	list_test_entry e2;
+	zf_list_insert_head_(&hpp, &e2);
+	TEST_VERIFY_FALSE(zf_list_empty(&hpp));
+	TEST_VERIFY_NOT_EQUAL(zf_list_end_(&hpp), zf_list_begin_(&hpp));
+	TEST_VERIFY_EQUAL(&e2, zf_list_first_(&hpp));
+	TEST_VERIFY_EQUAL(&e1, zf_list_next_(&hpp, &e2));
+	TEST_VERIFY_EQUAL(zf_list_rend_(&hpp), zf_list_prev_(&hpp, &e2));
+	TEST_VERIFY_EQUAL(&e0, zf_list_next_(&hpp, &e1));
+	TEST_VERIFY_EQUAL(&e2, zf_list_prev_(&hpp, &e1));
+	TEST_VERIFY_EQUAL(zf_list_end_(&hpp), zf_list_next_(&hpp, &e0));
+	TEST_VERIFY_EQUAL(&e1, zf_list_prev_(&hpp, &e0));
+#endif
 }
 
 static void test_zf_list_insert_before()

@@ -808,7 +808,24 @@ T *zf_list_rend_(zf_list_head_<T, node> *const h)
 }
 
 template <typename T, zf_list_node T:: *node>
+_ZF_QUEUE_CONSTEXPR
+T *zf_list_next_(const zf_list_head_<T, node> *const, T *const e)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return zf_entry_(zf_list_next(&(e->*node)), node);
+}
+
+template <typename T, zf_list_node T:: *node>
+_ZF_QUEUE_CONSTEXPR
+T *zf_list_prev_(zf_list_head_<T, node> *const h, T *const e)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return zf_entry_(zf_list_prev(h, &(e->*node)), node);
+}
+
+template <typename T, zf_list_node T:: *node>
 void zf_list_insert_head_(zf_list_head_<T, node> *const h, T *const e)
+	_ZF_QUEUE_NOEXCEPT
 {
 	zf_list_insert_head(h,  &(e->*node));
 }
