@@ -113,7 +113,7 @@ Below is a list of examples:
 * [slist_args.cpp](examples/slist_args.cpp) - singly-linked list in C++
 * [tailq_c_vs_cpp](examples/tailq_c_vs_cpp.cpp) - tail queue C and C++
   interface comparison
-* [tailq_subsets](examples/tailq_subsets.cpp) - tail queue for generating subsets
+* [tailq_subsets.cpp](examples/tailq_subsets.cpp) - tail queue for generating subsets
 
 C++ and C interfaces are almost identical, the main difference is that C++
 interface operates in terms of entries instead of nodes. Consider:
