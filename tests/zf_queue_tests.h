@@ -638,21 +638,61 @@ static void test_zf_list(TEST_SUIT_ARGUMENTS)
 /*
  * Singly-linked tail queue
  */
+typedef struct stailq_test_entry
+{
+	unsigned a[3];
+	zf_stailq_node node;
+	unsigned b[5];
+}
+stailq_test_entry;
+#ifdef __cplusplus
+typedef zf_stailq_head_t(stailq_test_entry, node) stailq_test_head_;
+#endif
+
+static void test_zf_stailq_entry()
+{
+	stailq_test_entry e0;
+	zf_stailq_node *const n0 = &e0.node;
+	TEST_VERIFY_EQUAL(&e0, zf_entry(n0, stailq_test_entry, node));
+#ifdef __cplusplus
+	TEST_VERIFY_EQUAL(&e0, zf_entry_(n0, &stailq_test_entry::node));
+#endif
+}
+
 static void test_zf_stailq_initializer()
 {
-	zf_stailq_head h = ZF_STAILQ_INITIALIZER(&h);
-	TEST_VERIFY_TRUE(zf_stailq_empty(&h));
-	TEST_VERIFY_EQUAL(nullptr, zf_stailq_first(&h));
-	TEST_VERIFY_EQUAL(nullptr, zf_stailq_last(&h));
+	{
+		zf_stailq_head h = ZF_STAILQ_INITIALIZER(&h);
+		TEST_VERIFY_TRUE(zf_stailq_empty(&h));
+		TEST_VERIFY_EQUAL(zf_stailq_end(&h), zf_stailq_begin(&h));
+	}
+#ifdef __cplusplus
+	{
+		stailq_test_head_ hpp = ZF_STAILQ_INITIALIZER(&hpp);
+		TEST_VERIFY_TRUE(zf_stailq_empty(&hpp));
+		TEST_VERIFY_EQUAL(zf_stailq_end(&hpp), zf_stailq_begin(&hpp));
+		TEST_VERIFY_EQUAL(zf_stailq_end_(&hpp), zf_stailq_begin_(&hpp));
+	}
+#endif
 }
 
 static void test_zf_stailq_init()
 {
-	zf_stailq_head h;
-	zf_stailq_init(&h);
-	TEST_VERIFY_TRUE(zf_stailq_empty(&h));
-	TEST_VERIFY_EQUAL(nullptr, zf_stailq_first(&h));
-	TEST_VERIFY_EQUAL(nullptr, zf_stailq_last(&h));
+	{
+		zf_stailq_head h;
+		zf_stailq_init(&h);
+		TEST_VERIFY_TRUE(zf_stailq_empty(&h));
+		TEST_VERIFY_EQUAL(zf_stailq_end(&h), zf_stailq_begin(&h));
+	}
+#ifdef __cplusplus
+	{
+		stailq_test_head_ hpp;
+		zf_stailq_init(&hpp);
+		TEST_VERIFY_TRUE(zf_stailq_empty(&hpp));
+		TEST_VERIFY_EQUAL(zf_stailq_end(&hpp), zf_stailq_begin(&hpp));
+		TEST_VERIFY_EQUAL(zf_stailq_end_(&hpp), zf_stailq_begin_(&hpp));
+	}
+#endif
 }
 
 static void test_zf_stailq_insert_head()
@@ -797,6 +837,7 @@ static void test_zf_stailq_remove_after()
 
 static void test_zf_stailq(TEST_SUIT_ARGUMENTS)
 {
+	TEST_EXECUTE(test_zf_stailq_entry());
 	TEST_EXECUTE(test_zf_stailq_initializer());
 	TEST_EXECUTE(test_zf_stailq_init());
 	TEST_EXECUTE(test_zf_stailq_insert_head());

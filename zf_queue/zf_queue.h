@@ -469,6 +469,20 @@ struct zf_stailq_node *zf_stailq_last(struct zf_stailq_head *const h)
 }
 
 _ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
+struct zf_stailq_node *zf_stailq_begin(struct zf_stailq_head *const h)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return h->first.next;
+}
+
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
+struct zf_stailq_node *zf_stailq_end(struct zf_stailq_head *const h)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return (void)h, (zf_stailq_node *)0;
+}
+
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
 struct zf_stailq_node *zf_stailq_next(struct zf_stailq_node *const n)
 	_ZF_QUEUE_NOEXCEPT
 {
@@ -864,6 +878,31 @@ void zf_list_remove_(const zf_list_head_<T, node> *const, T *const e)
 	_ZF_QUEUE_NOEXCEPT
 {
 	zf_list_remove(&(e->*node));
+}
+
+/*
+ * Singly-linked tail queue C++ support
+ */
+template <typename T, zf_stailq_node T:: *node>
+struct zf_stailq_head_: zf_stailq_head {
+	zf_stailq_head_() {}
+	zf_stailq_head_(const zf_stailq_head &h) _ZF_QUEUE_NOEXCEPT: zf_stailq_head(h) {}
+};
+
+template <typename T, zf_stailq_node T:: *node>
+_ZF_QUEUE_CONSTEXPR
+T *zf_stailq_begin_(zf_stailq_head_<T, node> *const h)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return zf_entry_(zf_stailq_begin(h), node);
+}
+
+template <typename T, zf_stailq_node T:: *node>
+_ZF_QUEUE_CONSTEXPR
+T *zf_stailq_end_(zf_stailq_head_<T, node> *const h)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return zf_entry_(zf_stailq_end(h), node);
 }
 
 /*
