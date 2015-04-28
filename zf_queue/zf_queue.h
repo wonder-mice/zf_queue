@@ -60,8 +60,8 @@
  * _empty                       +       +       +       +
  * _first                       +       +       +       +
  * _last                        -       -       +       +
- * _begin                       +       +       #       +
- * _end                         +       +       #       +
+ * _begin                       +       +       +       +
+ * _end                         +       +       +       +
  * _rbegin                      -       -       -       #
  * _rend                        -       +       -       #
  * _next                        +       +       +       +
@@ -90,7 +90,7 @@
  * Where:
  *  "-" - operation is not supported by that data structure
  *  "+" - operation is supported and implemented
- *  "#" - operation is supported, but not implemented (yet)
+ *  "#" - operation is supported, but not implemented
  *
  * "Node" is a field inside "entry". "Node" allows "entry" to be a list item.
  * "Entry" has one or more "nodes" as fields and can be used as a list item.
