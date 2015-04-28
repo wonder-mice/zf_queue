@@ -3,8 +3,18 @@
 #ifndef _ZF_QUEUE_H_
 #define _ZF_QUEUE_H_
 
-/*
- * This file defines four types of data structures: singly-linked lists,
+/* Define ZF_QUEUE_VERSION_REQUIRED to current value of ZF_QUEUE_VERSION before
+ * including this file (or via compiler command line). In that case compilation
+ * will break when non-compatible change is introduced.
+ */
+#define ZF_QUEUE_VERSION 1
+#if defined(ZF_QUEUE_VERSION_REQUIRED)
+	#if ZF_QUEUE_VERSION_REQUIRED != ZF_QUEUE_VERSION
+		#error zf_queue version mismatch
+	#endif
+#endif
+
+/* This file defines four types of data structures: singly-linked lists,
  * singly-linked tail queues, lists and tail queues.
  *
  * A singly-linked list is headed by a single forward pointer. The elements
@@ -42,7 +52,7 @@
  * after an existing element, at the head of the list, or at the end of
  * the list. A tail queue may be traversed in either direction.
  *
- *                              SLIST	LIST	STAILQ	TAILQ
+ *                              SLIST   LIST    STAILQ  TAILQ
  * _node                        +       +       +       +
  * _head                        +       +       +       +
  * _INITIALIZER                 +       +       +       +
@@ -50,8 +60,10 @@
  * _empty                       +       +       +       +
  * _first                       +       +       +       +
  * _last                        -       -       +       +
- * _begin                       +                       +
- * _end                         +                       +
+ * _begin                       +       +       #       +
+ * _end                         +       +       #       +
+ * _rbegin                      -       -       -       #
+ * _rend                        -       +       -       #
  * _next                        +       +       +       +
  * _prev                        -       +       -       +
  * _insert_head                 +       +       +       +
@@ -61,19 +73,24 @@
  * _remove                      -       +       -       +
  * _remove_head                 +       -       +       -
  * _remove_after                +       -       +       -
- * _concat                      -
- * _swap                        +
+ * _concat                      -		#		#		#
+ * _swap                        +		#		#		#
+ * Experimental (no tests):
+ * _foreach                     #       #       #       +
+ * _foreach_from                #       #       #       +
  *
- * _foreach                     -       -       -       +
- * _foreach_from                -       -       -       +
+ * _FOREACH_FROM                #       #       #       #
+ * _FOREACH_SAFE                #       #       #       #
+ * _FOREACH_FROM_SAFE           #       #       #       #
+ * _FOREACH_REVERSE             -       -       -       #
+ * _FOREACH_REVERSE_FROM        -       -       -       #
+ * _FOREACH_REVERSE_SAFE        -       -       -       #
+ * _FOREACH_REVERSE_FROM_SAFE   -       -       -       #
  *
- * _FOREACH_FROM              +	+	+	+
- * _FOREACH_SAFE              +	+	+	+
- * _FOREACH_FROM_SAFE         +	+	+	+
- * _FOREACH_REVERSE           -	-	-	+
- * _FOREACH_REVERSE_FROM      -	-	-	+
- * _FOREACH_REVERSE_SAFE      -	-	-	+
- * _FOREACH_REVERSE_FROM_SAFE -	-	-	+
+ * Where:
+ *  "-" - operation is not supported by that data structure
+ *  "+" - operation is supported and implemented
+ *  "#" - operation is supported, but not implemented (yet)
  *
  * "Node" is a field inside "entry". "Node" allows "entry" to be a list item.
  * "Entry" has one or more "nodes" as fields and can be used as a list item.
@@ -84,12 +101,18 @@
  *
  *   List EntryList;
  *
- * Functions zf_xxx_first() and zf_xxx_last() only work for non-empty lists.
+ * Functions zf_xxx_first() and zf_xxx_last() only work with non-empty lists.
  * Behaviour of those functions is undefined for empty lists.
  *
- * Functions zf_xxx_begin() and zf_xxx_end() could be used for empty lists.
- * For empty list h: zf_xxx_begin(h) == zf_xxx_end(h).
- * For last node n of list h: zf_xxx_next(n) == zf_xxx_end(h).
+ * Functions zf_xxx_begin(), zf_xxx_end(), zf_xxx_rbegin() and zf_xxx_rend()
+ * could be used with empty lists too.
+ * For empty list h:
+ *   zf_xxx_begin(h) == zf_xxx_end(h)
+ *   zf_xxx_rbegin(h) == zf_xxx_rend(h)
+ * For last node n of list h:
+ *   zf_xxx_next(n) == zf_xxx_end(h)
+ * For first node n of list h:
+ *   zf_xxx_prev(n) == zf_xxx_rend(h)
  * The same is true for C++ extensions zf_xxx_yyy_().
  */
 
@@ -285,6 +308,27 @@ struct zf_list_node *zf_list_first(struct zf_list_head *const h)
 	_ZF_QUEUE_NOEXCEPT
 {
 	return h->first;
+}
+
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
+struct zf_list_node *zf_list_begin(struct zf_list_head *const h)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return h->first;
+}
+
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
+struct zf_list_node *zf_list_end(struct zf_list_head *const h)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return (void)h, (zf_list_node *)0;
+}
+
+_ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
+struct zf_list_node *zf_list_rend(struct zf_list_head *const h)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return (void)h, (zf_list_node *)0;
 }
 
 _ZF_QUEUE_DECL _ZF_QUEUE_CONSTEXPR
@@ -732,9 +776,35 @@ struct zf_list_head_: zf_list_head
 };
 
 template <typename T, zf_list_node T:: *node>
+_ZF_QUEUE_CONSTEXPR
 T *zf_list_first_(zf_list_head_<T, node> *const h)
+	_ZF_QUEUE_NOEXCEPT
 {
 	return zf_entry_(zf_list_first(h), node);
+}
+
+template <typename T, zf_list_node T:: *node>
+_ZF_QUEUE_CONSTEXPR
+T *zf_list_begin_(zf_list_head_<T, node> *const h)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return zf_entry_(zf_list_begin(h), node);
+}
+
+template <typename T, zf_list_node T:: *node>
+_ZF_QUEUE_CONSTEXPR
+T *zf_list_end_(zf_list_head_<T, node> *const h)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return zf_entry_(zf_list_end(h), node);
+}
+
+template <typename T, zf_list_node T:: *node>
+_ZF_QUEUE_CONSTEXPR
+T *zf_list_rend_(zf_list_head_<T, node> *const h)
+	_ZF_QUEUE_NOEXCEPT
+{
+	return zf_entry_(zf_list_rend(h), node);
 }
 
 template <typename T, zf_list_node T:: *node>

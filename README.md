@@ -39,7 +39,7 @@ Put [zf_queue.h](zf_queue/zf_queue.h) into your source tree.
 Include as usual:
 
 ```c
-#include "zf_queue.h"
+#include <zf_queue.h>
 ```
 
 ### Embedding with CMake
@@ -60,7 +60,7 @@ target_link_libraries(my_target zf_queue)
 Include as usual:
 
 ```c
-#include "zf_queue.h"
+#include <zf_queue.h>
 ```
 
 ### Installation
@@ -89,6 +89,20 @@ For each target that uses zf_queue in corresponding CMakeLists.txt file add:
 ```cmake
 target_link_libraries(my_target zf_queue)
 ```
+
+### Versioning
+
+It's recommended to define `ZF_QUEUE_VERSION_REQUIRED` to current value of
+`ZF_QUEUE_VERSION` before [zf_queue.h](zf_queue/zf_queue.h) include:
+
+```c
+#define ZF_QUEUE_VERSION_REQUIRED 1
+#include <zf_queue.h>
+```
+
+For each non-compatible change `ZF_QUEUE_VERSION` will be incremented. If
+code defines `ZF_QUEUE_VERSION_REQUIRED` compilation will break when those
+numbers do not match.
 
 Examples
 --------
