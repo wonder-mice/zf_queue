@@ -73,8 +73,8 @@
  * _remove                      -       +       -       +
  * _remove_head                 +       -       +       -
  * _remove_after                +       -       +       -
- * _concat                      -		#		#		#
- * _swap                        +		#		#		#
+ * _concat                      -       #       #       #
+ * _swap                        +       #       #       #
  * Experimental (no tests):
  * _foreach                     #       #       #       +
  * _foreach_from                #       #       #       +
